@@ -38,7 +38,7 @@ def main():
 
     iterationNumber = 5
     numberEpochs = 20
-    timeSteps = 10
+    timeSteps = 30
 
     resAll = np.empty((timeSteps,numberEpochs, iterationNumber))
 
