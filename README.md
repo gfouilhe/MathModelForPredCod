@@ -1,4 +1,5 @@
-# MathModelForPredCod
+# Mathematical Models For Predictive Coding
+
 This repository contains code for studying diverse mathematical properties of predictive coding deep neural networks.
 
 xH -> x Hidden Layers
