@@ -28,7 +28,7 @@ def main():
     train_loader = torch.utils.data.DataLoader(dataset_train, batch_size=batchSize, shuffle=True, num_workers=1)
     test_loader = torch.utils.data.DataLoader(dataset_test, batch_size=batchSize, shuffle=False, num_workers=1)
 
-    gammaFw = 0.5
+    gammaFw = 0.6
     alphaRec = 0.01
     betaFB = 0.2
 
