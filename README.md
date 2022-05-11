@@ -2,8 +2,11 @@
 This repository contains code for studying diverse mathematical properties of predictive coding deep neural networks.
 
 xH -> x Hidden Layers
+
 FB -> Feedback + feedforward (full PC model)
+
 FF -> Feedforward
+
 S -> Simple two-circles dataset
 
 References :
