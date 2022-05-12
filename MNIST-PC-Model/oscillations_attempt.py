@@ -45,18 +45,19 @@ for i,im in enumerate(imgs):
         actB[i,t+1,:] = bTemp.detach().numpy()
         actO[i,t+1,:] = oTemp.detach().numpy()
 
-actA = np.linalg.norm(actA,axis=2)
-actB = np.linalg.norm(actB,axis=2)
-actO = np.linalg.norm(actO,axis=2)
+# actA = np.linalg.norm(actA,axis=2)
+# actB = np.linalg.norm(actB,axis=2)
+# actO = np.linalg.norm(actO,axis=2)
+
 for i, _ in enumerate(imgs):
     plt.figure(figsize=(15,5))
     plt.subplot(1,3,1)
-    plt.plot(actA[i])
+    plt.plot(actA[i,:,0])
     plt.subplot(1,3,2)
-    plt.plot(actB[i])
+    plt.plot(actB[i,:,0])
     plt.subplot(1,3,3)
-    plt.plot(actO[i])
-    plt.savefig(os.path.join('oscillations_attempt_plot',f'img{i}'))
+    plt.plot(actO[i,:,0])
+    plt.savefig(os.path.join('oscillations_attempt_plot_2',f'img{i}'))
     plt.close()
 
 
