@@ -17,3 +17,4 @@ References :
 - On the role of feedback in visual processing: a predictive coding perspective,  A. Alamia et al. https://arxiv.org/abs/2106.04225
   - code : https://github.com/artipago/Role_of_Feedback_in_Predictive_Coding  
 - On neural differential equations, P. Kidger https://arxiv.org/abs/2202.02435
+- Alpha oscillations and traveling waves: Signatures of predictive coding ?, A. Alamia & R. VanRullenhttps://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3000487
