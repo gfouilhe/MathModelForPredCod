@@ -5,6 +5,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
+import pickle 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
 
@@ -91,8 +92,14 @@ pseudo_inv = np.linalg.pinv(Win)
 
 osci_imgs = [(beta,gamma,pseudo_inv.dot(y[:120].astype('float64')-Winb)) for beta,gamma,y in osci_eigv]
 
-unflattened_imgs = [img.reshape((28,28)) for _,_,img in osci_imgs]
+unflattened_imgs = dict([(f"im{i})",(img[0],img[1],img[2].reshape((28,28)))) for i, img in enumerate(osci_imgs)])
+with open(os.path.join('oscillations_parameters_setup','params_dictionary.pkl'), 'wb') as f:
+    pickle.dump(unflattened_imgs, f)
 
-for i,img in enumerate(unflattened_imgs):
-    plt.imsave(os.path.join('oscillations_parameters_setup',f'img{i}.png'),img, cmap='gray')
+
+# np.save(os.path.join('oscillations_parameters_setup','paramsandimgs.npy'),np.array(unflattened_imgs,dtype=object))
+
+# for i,img in enumerate(unflattened_imgs):
+#     _,_,img = img
+#     plt.imsave(os.path.join('oscillations_parameters_setup',f'img{i}.png'),img, cmap='gray')
 

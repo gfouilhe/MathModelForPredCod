@@ -8,30 +8,37 @@ import os
 import matplotlib.pyplot as plt
 from model import PCMLP
 from PIL import Image
+import pickle
 
-good_parameters = np.load(os.path.join('oscillations_parameters_setup','good_params.npy'))
+# good_parameters = np.load(os.path.join('oscillations_parameters_setup','good_params.npy'))
 
+# params_and_imgs = np.load(os.path.join('oscillations_parameters_setup','paramsandimgs.npy'))
 
-pcmodel = PCMLP(0.33,0.01,0.2,0.5)
-checkpointPhase = torch.load(os.path.join('models',"PC_E19_I4.pth"))
-pcmodel.load_state_dict(checkpointPhase["module"])
+with open(os.path.join('oscillations_parameters_setup','params_dictionary.pkl'), 'rb') as f:
+    params_and_imgs = pickle.load(f)
+
+params_list = [param for _,param in params_and_imgs.items()]
 
 rgba2gray = lambda x: np.dot(x[...,:3], [0.2989, 0.5870, 0.1140])
 
-imgs = [rgba2gray(255 *plt.imread(os.path.join('oscillations_parameters_setup',f'img{i}.png'))).reshape((28,28)) for i in range(1,40)]
+# imgs = [rgba2gray(255 *plt.imread(os.path.join('oscillations_parameters_setup',f'img{i}.png'))).reshape((28,28)) for i in range(1,40)]
 
 batchSize = 1
 
 
 timeSteps = 50
 
-actA = np.zeros((len(imgs),timeSteps+1,120))
-actB = np.zeros((len(imgs),timeSteps+1,120))
-actO = np.zeros((len(imgs),timeSteps+1,10))
+actA = np.zeros((len(params_list),timeSteps+1,120))
+actB = np.zeros((len(params_list),timeSteps+1,120))
+actO = np.zeros((len(params_list),timeSteps+1,10))
 
 
-for i,im in enumerate(imgs):
-    img = torch.from_numpy(im.astype('float32'))
+for i,im in enumerate(params_list):
+    beta,gamma,img = im
+    pcmodel = PCMLP(0.33,0.01,betaFB=beta,gammaFw=gamma)
+    checkpointPhase = torch.load(os.path.join('models',"PC_E19_I4.pth"))
+    pcmodel.load_state_dict(checkpointPhase["module"])
+    img = torch.from_numpy(img.astype('float32'))
     aTemp = torch.zeros(batchSize, 120)
     bTemp = torch.zeros(batchSize, 120)
     oTemp = torch.zeros(batchSize, 10)
@@ -45,19 +52,19 @@ for i,im in enumerate(imgs):
         actB[i,t+1,:] = bTemp.detach().numpy()
         actO[i,t+1,:] = oTemp.detach().numpy()
 
-# actA = np.linalg.norm(actA,axis=2)
-# actB = np.linalg.norm(actB,axis=2)
-# actO = np.linalg.norm(actO,axis=2)
+actA = np.linalg.norm(actA,axis=2)
+actB = np.linalg.norm(actB,axis=2)
+actO = np.linalg.norm(actO,axis=2)
 
-for i, _ in enumerate(imgs):
+for i, _ in enumerate(params_list):
     plt.figure(figsize=(15,5))
     plt.subplot(1,3,1)
-    plt.plot(actA[i,:,0])
+    plt.plot(actA[i])
     plt.subplot(1,3,2)
-    plt.plot(actB[i,:,0])
+    plt.plot(actB[i])
     plt.subplot(1,3,3)
-    plt.plot(actO[i,:,0])
-    plt.savefig(os.path.join('oscillations_attempt_plot_2',f'img{i}'))
+    plt.plot(actO[i])
+    plt.savefig(os.path.join('oscillations_attempt_plot_norm',f'img{i}'))
     plt.close()
 
 
