@@ -21,9 +21,10 @@ def plot_data(data):
     plt.figure()
     for i in range(9):
         image,_ = data[i]
+        print(image)
         plt.subplot(3,3,i+1)
         plt.imshow(image.reshape((28,28)),cmap='gray')
     plt.show()
 
-#plot_data(train)
+plot_data(train)
 

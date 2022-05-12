@@ -8,31 +8,16 @@ from PIL import Image
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
 
-def ClosestToOne(w,tol = 10**-4):
-    inf = w[0]
-    iinf = 0
-    sup = w[0]
-    isup = 0
-    ones = []
-
-    for i,eig in enumerate(w):
-        if abs(eig) < 1 - tol:
-            if abs(eig) > abs(inf):
-                inf = eig
-                iinf = i
-        elif abs(eig) > 1 + tol:
-            if abs(eig)< abs(sup):
-                sup = eig
-                isup = i
-        else:
-            ones.append((i,eig))
-    return ones, inf, iinf, sup, isup
+def RhoCloseToOne(w,l,beta,gamma,tol = 10**-4):
+    rho = np.max(abs(w))
+    if abs(1-rho) < tol:
+        return l.append((beta,gamma))
 
 
 alpha = 0.01
 
-betaR = list(np.arange(0,1,0.01))[1:]
-gammaR = list(np.arange(0,1,0.01))[1:]
+betaR = list(np.arange(0,1,0.005))[1:]
+gammaR = list(np.arange(0,1,0.005))[1:]
 
 threshold = []
 
@@ -49,38 +34,41 @@ for name, p in model.named_parameters():
         Win = tmp
     if name=='fcin.bias':
         Winb = tmp
-'''
-good_params = []
-for beta in betaR:
-    for i, gamma in enumerate(gammaR):
-        if beta + gamma > 1:
-            pass
-        else:
-            d = 120
 
-            A11 = (1-beta-gamma) * np.eye(d)
-            A12 = beta * Wba
-            A21 = (1-beta-gamma) * gamma * Wab + alpha/d * Wba.T
-            A22 = gamma * beta * Wab.dot(Wba) + (1-gamma) * np.eye(d) - alpha/d * Wba.T.dot(Wba)
-            A = np.block([[A11,A12],[A21,A22]])
+# good_params = []
+# for beta in betaR:
+#     for i, gamma in enumerate(gammaR):
+#         if beta + gamma > 1:
+#             pass
+#         else:
+#             d = 120
 
-            w, v = np.linalg.eig(A)
-            ones, inf, iinf, sup, isup = ClosestToOne(w)
+#             A11 = (1-beta-gamma) * np.eye(d)
+#             A12 = beta * Wba
+#             A21 = (1-beta-gamma) * gamma * Wab + alpha/d * Wba.T
+#             A22 = gamma * beta * Wab.dot(Wba) + (1-gamma) * np.eye(d) - alpha/d * Wba.T.dot(Wba)
+#             A = np.block([[A11,A12],[A21,A22]])
 
-            if ones:
-                good_params.append((beta,gamma))
+#             w, v = np.linalg.eig(A)
+#             RhoCloseToOne(w,good_params,beta,gamma,tol = 10**-4)
 
 
-np.save(os.path.join('oscillations_parameters_setup','good_params.npy'),good_params)
-'''
+# np.save(os.path.join('oscillations_parameters_setup','good_params.npy'),good_params)
 
-good_params = np.load(os.path.join('oscillations_parameters_setup','good_params.npy'))
+
+good_params = np.load(os.path.join('oscillations_parameters_setup','good_params.npy'))  
 plt.figure()
 plt.scatter(*zip(*good_params))
+x = np.linspace(0,1,100)
+plt.plot(x,1-x,linestyle='dashed',label='beta+gamma = 1',color='red')
 plt.xlabel('beta')
+plt.xlim((0,1))
+plt.ylim((0,1))
 plt.ylabel('gamma')
 plt.title('Potential oscillations for alpha = 0.01')
+plt.legend()
 plt.savefig(os.path.join('oscillations_parameters_setup','potential_good_parameters.png'))
+plt.show()
 
 d = 120
 osci_eigv = []
@@ -95,7 +83,7 @@ for beta,gamma in good_params:
 
     w, v = np.linalg.eig(A)
     for i,eig in enumerate(w):
-        if np.isreal(eig):
+        if np.isreal(eig) or abs(1-abs(eig)) > 10**-4 :
             pass
         else:
             osci_eigv.append((beta,gamma,v[i]))
@@ -106,12 +94,5 @@ osci_imgs = [(beta,gamma,pseudo_inv.dot(y[:120].astype('float64')-Winb)) for bet
 unflattened_imgs = [img.reshape((28,28)) for _,_,img in osci_imgs]
 
 for i,img in enumerate(unflattened_imgs):
-    if i < 3014:
-        pass
-    else:
-        plt.figure()
-        plt.imshow(img,cmap='gray')
-        plt.savefig(os.path.join('oscillations_parameters_setup',f'img{i}.png'))
-        plt.close()
-
+    plt.imsave(os.path.join('oscillations_parameters_setup',f'img{i}.png'),img, cmap='gray')
 
