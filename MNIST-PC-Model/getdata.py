@@ -28,3 +28,27 @@ def plot_data(data):
 
 plot_data(train)
 
+
+
+def get_oscillating_data():
+    
+    pass
+
+class Dataset(torch.utils.data.Dataset):
+  'Characterizes a dataset for PyTorch'
+  def __init__(self, x_data, y_labels):
+        'Initialization'
+        self.y = y_labels
+        self.x = x_data
+
+  def __len__(self):
+        'Denotes the total number of samples'
+        return len(self.x)
+
+  def __getitem__(self, index):
+        'Generates one sample of data'
+        # Select sample
+        X = self.x[index].unsqueeze_(0)
+        y = self.y[index]
+
+        return X, y

@@ -38,13 +38,13 @@ class PCMLP(nn.Module):
 
         batchSize = a.shape[0]
 
+
         assert networkMode in ['forward','full']
 
         if networkMode == 'forward':
 
             aNew = self.activation(self.fcin(i))
             bNew= self.activation(self.fcAB(aNew))
-            #cNew = self.activation(self.fcBC(bNew))
             oNew = self.fcout(bNew)
 
 
@@ -68,8 +68,6 @@ class PCMLP(nn.Module):
             oNew = self.fcout(bNew)
 
         out =  torch.log_softmax(oNew,dim=1)
-
-
         return out, i, aNew, bNew,  oNew, reconstructionA
 
     
