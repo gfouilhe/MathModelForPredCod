@@ -7,26 +7,26 @@ import matplotlib.pyplot as plt
 import os
 
 def get_data():
-    train = datasets.MNIST(os.path.join('data'),train=True,download=False,transform=transforms.ToTensor())
-    test = datasets.MNIST(os.path.join('data'),train=False,download=False,transform=transforms.ToTensor())
+    train = datasets.MNIST(os.path.join('data'),train=True,download=False,transform=transforms.Compose([transforms.Resize((14,14)),transforms.ToTensor()]))
+    test = datasets.MNIST(os.path.join('data'),train=False,download=False,transform=transforms.Compose([transforms.Resize((14,14)),transforms.ToTensor()]))
     return train,test
 
-train,test = get_data()
+# train,test = get_data()
 
-#print(train)
-#print(test)
+# print(train)
+# print(test)
 
 
 def plot_data(data):
     plt.figure()
     for i in range(9):
         image,_ = data[i]
-        print(image)
+        # print(image)
         plt.subplot(3,3,i+1)
-        plt.imshow(image.reshape((28,28)),cmap='gray')
+        plt.imshow(image.reshape((14,14)),cmap='gray')
     plt.show()
 
-#plot_data(train)
+# plot_data(train)
 
 
 

@@ -27,8 +27,3 @@ path = os.path.join('accuracies','accTrainingFFCE.npy')
 acc = np.load(path)
 
 print('Mean FF : ', getMean(acc))
-
-
-path = os.path.join('accuracies','accLinear.npy')
-acc = np.load(path)
-print('Mean Linear : ', getMean(acc,mode='fb'))

@@ -8,13 +8,13 @@ class PCMLP(nn.Module):
     Architechture :
     all FC
 
-    784--> 120 --> 120 --> 10 
+    196--> 196 --> 196 --> 10 
     I      A        B       O
            |---R <--|
 
     
     '''
-    def __init__(self, memory, alphaRec, betaFB, gammaFw, num_hidden = 120,linear=False):
+    def __init__(self, memory, alphaRec, betaFB, gammaFw,linear=False):
         
         super(PCMLP,self).__init__()
 
@@ -22,8 +22,8 @@ class PCMLP(nn.Module):
         self.alphaRec = alphaRec * torch.ones(1)
         self.betaFB = betaFB * torch.ones(1)
         self.memory = memory * torch.ones(1)
-        self.num_hidden = num_hidden
-        self.fcin = nn.Linear(784,self.num_hidden)
+        self.num_hidden = 196
+        self.fcin = nn.Linear(self.num_hidden,self.num_hidden)
         self.fcAB = nn.Linear(self.num_hidden,self.num_hidden)
         self.fcBA = nn.Linear(self.num_hidden,self.num_hidden)
         #self.fcBC = nn.Linear(self.num_hidden,self.num_hidden)
