@@ -1,8 +1,4 @@
 import torch
-# import torchvision.transforms as transforms
-# import torch.nn as nn
-# import torch.nn.functional as F
-# import torch.optim as optim
 import numpy as np
 import os
 import matplotlib.pyplot as plt
@@ -10,9 +6,6 @@ from model import PCMLP
 from PIL import Image
 import pickle
 
-# good_parameters = np.load(os.path.join('oscillations_parameters_setup','good_params.npy'))
-
-# params_and_imgs = np.load(os.path.join('oscillations_parameters_setup','paramsandimgs.npy'))
 
 with open(os.path.join('oscillations_parameters_setup','params_dictionary.pkl'), 'rb') as f:
     params_and_imgs = pickle.load(f)
@@ -21,15 +14,14 @@ params_list = [param for _,param in params_and_imgs.items()]
 
 rgba2gray = lambda x: np.dot(x[...,:3], [0.2989, 0.5870, 0.1140])
 
-# imgs = [rgba2gray(255 *plt.imread(os.path.join('oscillations_parameters_setup',f'img{i}.png'))).reshape((28,28)) for i in range(1,40)]
 
 batchSize = 1
 
 
 timeSteps = 50
 
-actA = np.zeros((len(params_list),timeSteps+1,120))
-actB = np.zeros((len(params_list),timeSteps+1,120))
+actA = np.zeros((len(params_list),timeSteps+1,196))
+actB = np.zeros((len(params_list),timeSteps+1,196))
 actO = np.zeros((len(params_list),timeSteps+1,10))
 
 
@@ -39,8 +31,8 @@ for i,im in enumerate(params_list):
     checkpointPhase = torch.load(os.path.join('models',"PC_E19_I4.pth"))
     pcmodel.load_state_dict(checkpointPhase["module"])
     img = torch.from_numpy(img.astype('float32'))
-    aTemp = torch.zeros(batchSize, 120)
-    bTemp = torch.zeros(batchSize, 120)
+    aTemp = torch.zeros(batchSize, 196)
+    bTemp = torch.zeros(batchSize, 196)
     oTemp = torch.zeros(batchSize, 10)
     _, _ , aTemp, bTemp, oTemp, _ = pcmodel(img.view(batchSize,-1), aTemp, bTemp, oTemp, 'forward')
     actA[i,0,:] = aTemp.detach().numpy()
