@@ -35,8 +35,8 @@ class PCMLP(nn.Module):
 
     def forward(self, i, a, b, c, o, networkMode):
 
-        errorA = []
         reconstructionA = []
+        reconstructionB = []
 
         batchSize = a.shape[0]
 
@@ -72,11 +72,11 @@ class PCMLP(nn.Module):
             errorA = nn.functional.mse_loss(self.fcBA(b), a)
             reconstructionA = torch.autograd.grad(errorA, b, retain_graph=True)[0]
 
-            errorB = nn.functional.mse_loss(self.fcBA(c), b)
+            errorB = nn.functional.mse_loss(self.fcCB(c), b)
             reconstructionB = torch.autograd.grad(errorB, c, retain_graph=True)[0]
 
             aNew = gammaFw * self.fcin(i) + (1 - gammaFw - betaBw) * a + betaBw * self.fcBA(b)
-            bNew = gammaFw * self.fcAB(aNew) + + (1 - gammaFw - betaBw) * b + betaBw * self.fcBA(c) - self.alphaRec * batchSize * reconstructionA
+            bNew = gammaFw * self.fcAB(aNew) + + (1 - gammaFw - betaBw) * b + betaBw * self.fcCB(c) - self.alphaRec * batchSize * reconstructionA
             cNew = gammaFw * self.fcBC(bNew) + + (1 - gammaFw) * c - self.alphaRec * batchSize * reconstructionB
             oNew = self.fcout(bNew)
 
