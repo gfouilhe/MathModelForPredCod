@@ -19,7 +19,9 @@ With other students, i provided a general overview of Predictive Coding with a c
 
 We will here mainly study mathematically the reccurence equation of Predictive Coding : 
 
-<img src="https://render.githubusercontent.com/render/math?math={\color{white} e^{n %2B 1}_j = \beta Wf_{j-1}e^{n %2B 1}_{j-1} %2B \lambda Wb_{j %2B 1}e^{n}_{j %2B 1} %2B (1 - \beta - \lambda ) e^{n}_{j} - \alpha \nabla E^{n}_{j-1}">
+    e^{n+1}_j = \beta Wf_{j-1}e^{n+1}_{j-1} + \lambda Wb_{j+1}e^{n}_{j+1} + (1 - \beta - \lambda ) e^{n}_{j} - \alpha \nabla E^{n}_{j-1}
+
+
 
 ## References :
 - Predictive Coding for Deep Neural Networks, G. Fouilhé et al. *TIR Work, not published* 
