@@ -29,7 +29,7 @@ where *n* are timesteps, *j* layers, *e* activations, *E* error of prediction, *
 
 ## Asymptotic behaviour
 
-We can rewrite previous reccurence equation vectorially, representing the activity of all layers on :
+We can rewrite previous reccurence equation vectorially, representing the activity of all layers on a single equation:
 
         e^{n+1} = \beta Wf e^{n+1} + \lambda Wb e^{n} + D e^{n} - \alpha / d E e^{n} + S
         
