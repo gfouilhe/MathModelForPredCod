@@ -10,6 +10,8 @@ FF -> Feedforward
 
 S -> Simple two-circles dataset
 
+MNIST-MxM -> MNIST dataset with image size (MxM)
+
 
 ## Introduction
 
