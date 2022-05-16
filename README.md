@@ -19,7 +19,14 @@ With other students, i provided a general overview of Predictive Coding with a c
 
 We will here mainly study mathematically the reccurence equation of Predictive Coding : 
 
-$$ a1= f(x) $$
+    e^{n+1}_j = \beta Wf_{j-1}e^{n+1}_{j-1} + \lambda Wb_{j+1}e^{n}_{j+1} + (1 - \beta - \lambda ) e^{n}_{j} - \alpha \nabla E^{n}_{j-1}
+
+
+where *n* are timesteps, *j* layers, *e* activations, *E* error of prediction, *Wf* and *Wb* weights.
+
+## Asymptotic behaviour
+
+## Time and space continuous model
 
 
 ## References :
