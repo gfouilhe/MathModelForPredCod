@@ -22,6 +22,12 @@ We will here mainly study mathematically the reccurence equation of Predictive C
     e^{n+1}_j = \beta Wf_{j-1}e^{n+1}_{j-1} + \lambda Wb_{j+1}e^{n}_{j+1} + (1 - \beta - \lambda ) e^{n}_{j} - \alpha \nabla E^{n}_{j-1}
 
 
+where *n* are timesteps, *j* layers, *e* activations, *E* error of prediction, *Wf* and *Wb* weights.
+
+## Asymptotic behaviour
+
+## Time and space continuous model
+
 
 ## References :
 - Predictive Coding for Deep Neural Networks, G. Fouilhé et al. *TIR Work, not published* 
