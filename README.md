@@ -10,8 +10,22 @@ FF -> Feedforward
 
 S -> Simple two-circles dataset
 
-References :
 
+## Introduction
+
+Predictive Coding is a popular framework in neurosciences for explaining cortical function. In this model, higher-level cortical areas try to predict lower-level neural activity using feedback connections and prediction errors are passed back to higher layers using feedforward connections. This theory is widely supported by observations and the feedback dynamic described is likely to play a keyrole in robustness. This motivates the attempt to bring this theory in the field of Machine Learning, where Deep Neural Networks generally only features feedforward connections.
+
+With other students, i provided a general overview of Predictive Coding with a computer science perspective in [Predictive Coding for Deep Neural Networks](LINK1).
+
+We will here mainly study mathematically the reccurence equation of Predictive Coding : 
+
+$$ a1= f(x)$$
+
+
+## References :
+- Predictive Coding for Deep Neural Networks, G. Fouilhé et al. *TIR Work, not published* 
+  - LINK1
+  - LINK2
 - Predify: Augmenting deep neural networks with brain-inspired predictive coding dynamics, B. Choksi et al. https://arxiv.org/abs/2106.02749
   - code : https://github.com/bhavinc/predify2021 and https://github.com/miladmozafari/predify
 - On the role of feedback in visual processing: a predictive coding perspective,  A. Alamia et al. https://arxiv.org/abs/2106.04225
