@@ -19,7 +19,7 @@ With other students, i provided a general overview of Predictive Coding with a c
 
 We will here mainly study mathematically the reccurence equation of Predictive Coding : 
 
-$$ a1= f(x)$$
+$$ a1= f(x) $$
 
 
 ## References :
