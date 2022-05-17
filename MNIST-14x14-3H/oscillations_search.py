@@ -23,7 +23,7 @@ gammaR = list(np.arange(0,1,0.005))[1:]
 threshold = []
 
 model= PCMLP(0.33,alpha,0.5,0.2)
-checkpointPhase = torch.load(os.path.join('models',f"PC_E19_I4.pth"))
+checkpointPhase = torch.load(os.path.join('models',f"PC_E19_I0.pth"))
 model.load_state_dict(checkpointPhase["module"])
 for name, p in model.named_parameters():
     tmp = p.detach().numpy()
