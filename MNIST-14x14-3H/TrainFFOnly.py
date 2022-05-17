@@ -57,8 +57,9 @@ def main():
             #train
             for i, data in enumerate(train_loader, 0):
 
-                aTemp = torch.zeros(batchSize, 120)
-                bTemp = torch.zeros(batchSize, 120)
+                aTemp = torch.zeros(batchSize, 196)
+                bTemp = torch.zeros(batchSize, 196)
+                cTemp = torch.zeros(batchSize, 196)
                 oTemp = torch.zeros(batchSize, 10)
 
 
@@ -69,9 +70,10 @@ def main():
 
                 aTemp.requires_grad = True
                 bTemp.requires_grad = True
+                cTemp.requires_grad = True
                 oTemp.requires_grad = True
 
-                outputs, iTemp, aTemp, bTemp, oTemp, reconstruction = pcNet(inputs.view(batchSize,-1), aTemp, bTemp, oTemp, 'forward')
+                outputs, _ , aTemp, bTemp, cTemp, oTemp, _,_ = pcNet(inputs.view(batchSize,-1), aTemp, bTemp, cTemp, oTemp, 'forward')
 
                 loss = criterion(outputs, labels)
                 finalLoss += loss
@@ -86,18 +88,20 @@ def main():
             total = 0
             for _, data in enumerate(test_loader, 0):
 
-                aTemp = torch.zeros(batchSize, 120)
-                bTemp = torch.zeros(batchSize, 120)
+                aTemp = torch.zeros(batchSize, 196)
+                bTemp = torch.zeros(batchSize, 196)
+                cTemp = torch.zeros(batchSize, 196)
                 oTemp = torch.zeros(batchSize, 10)
 
                 aTemp.requires_grad = True
                 bTemp.requires_grad = True
+                cTemp.requires_grad = True
                 oTemp.requires_grad = True
 
                 # get the inputs; data is a list of [inputs, labels]
                 inputs, labels = data
 
-                outputs, iTemp, aTemp, bTemp, oTemp, reconstruction = pcNet(inputs.view(batchSize,-1), aTemp, bTemp, oTemp, 'forward')
+                outputs, _ , aTemp, bTemp, cTemp, oTemp, _,_ = pcNet(inputs.view(batchSize,-1), aTemp, bTemp, cTemp, oTemp, 'forward')
                 
                 _, predicted = torch.max(outputs.data, 1)
                 correct += (predicted == labels).sum().item()
