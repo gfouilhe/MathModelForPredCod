@@ -5,12 +5,12 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
-import pickle 
+import pickle
+from scipy.sparse.linalg import eigs
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
 
-def RhoCloseToOne(w,l,beta,gamma,tol = 10**-4):
-    rho = np.max(abs(w))
+def RhoCloseToOne(rho,l,beta,gamma,tol = 10**-4):
     if abs(1-rho) < tol:
         return l.append((beta,gamma))
 
@@ -35,6 +35,10 @@ for name, p in model.named_parameters():
         Win = tmp
     if name=='fcin.bias':
         Winb = tmp
+    if name=='fcBC.weight':
+        Wbc = p.detach().numpy()
+    if name=='fcCB.weight':
+        Wcb = p.detach().numpy()
 
 good_params = []
 for beta in betaR:
@@ -46,11 +50,16 @@ for beta in betaR:
 
             A11 = (1-beta-gamma) * np.eye(d)
             A12 = beta * Wba
-            A21 = (1-beta-gamma) * gamma * Wab + alpha/d * Wba.T
-            A22 = gamma * beta * Wab.dot(Wba) + (1-gamma) * np.eye(d) - alpha/d * Wba.T.dot(Wba)
-            A = np.block([[A11,A12],[A21,A22]])
+            A13 = np.zeros((d,d))
+            A21 = (1-beta-gamma) * gamma * Wba.T + alpha/d * Wba.T
+            A22 = gamma * beta * Wab.dot(Wba) + (1-beta-gamma) * np.eye(d) - alpha/d * Wba.T.dot(Wba)
+            A23 = beta * Wcb
+            A31 = (1-beta-gamma) * gamma**2 * Wbc.dot(Wab) + alpha/d * gamma * Wbc.dot(Wcb.T)
+            A32 = beta * gamma **2 * Wab.dot(Wba) + (1-beta-gamma) * gamma * Wbc - alpha/d * gamma * Wbc.dot(Wba.T.dot(Wba)) + alpha/d * Wcb.T
+            A33 = beta * gamma * Wbc * Wcb + (1-gamma) * np.eye(d) - alpha/d * Wcb.T.dot(Wcb)
+            A = np.block([[A11,A12,A13],[A21,A22,A23],[A31,A32,A33]])
 
-            w, v = np.linalg.eig(A)
+            w,_ = eigs(A,k=1) # ie spectral radius
             RhoCloseToOne(w,good_params,beta,gamma,tol = 10**-3)
 
 
@@ -94,7 +103,7 @@ print(good_params)
 osci_imgs = [(beta,gamma,inv.dot(y[:196].astype('float64')-Winb)) for beta,gamma,y in osci_eigv]
 print('osci :', osci_imgs)
 
-unflattened_imgs = dict([(f"im{i})",(img[0],img[1],img[2].reshape((28,28)))) for i, img in enumerate(osci_imgs)])
+unflattened_imgs = dict([(f"im{i})",(img[0],img[1],img[2].reshape((14,14)))) for i, img in enumerate(osci_imgs)])
 with open(os.path.join('oscillations_parameters_setup','params_dictionary.pkl'), 'wb') as f:
     pickle.dump(unflattened_imgs, f)
 
