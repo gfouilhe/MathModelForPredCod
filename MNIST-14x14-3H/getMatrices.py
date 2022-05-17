@@ -125,4 +125,12 @@ print(1-beta)
 
 # For this learned weights, any parameters choice beta, gamma, alpha in (0,1] s.t. sum() <=1 give the same result.
 
-
+d = 196
+J = 3
+Idj = np.eye(d*J)
+Id = np.eye(d)
+Z = np.zeros(d)
+Wf = np.block([[Z,Z,Z],[Wab,Z,Z],[Z,Wbc,Z]])
+Wb = np.block([[Z,Wba,Z],[Z,Z,Wcb],[Z,Z,Z]])
+D = np.block([[(1-beta-gamma)*Id,Z,Z],[Z,(1-beta-gamma)*Id,Z],[Z,Z,(1-gamma)*Id]])
+E = np.block([[-WZ,Wba,Z],[Z,Z,Wcb],[Z,Z,Z]])
