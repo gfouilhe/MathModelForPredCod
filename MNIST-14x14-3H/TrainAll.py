@@ -36,7 +36,7 @@ def main():
 
 
 
-    iterationNumber = 1
+    iterationNumber = 5
     numberEpochs = 20
     timeSteps = 30
 

@@ -41,6 +41,7 @@ A = np.block([[A11,A12,A13],[A21,A22,A23],[A31,A32,A33]])
 
 w, v = np.linalg.eig(A)
 ax = plt.gca()
+fig = plt.gcf()
 ax.cla()
 circle = plt.Circle((0,0),1,color='r',fill=False)
 ax.add_patch(circle)
@@ -51,7 +52,7 @@ for eig in w:
 
 ax.set_title('Eigenvalues of $\mathbb{A}, \\alpha_{mem}, \\beta_{Bw}, \gamma_{Fw} = 0.01, 0.5, 0.2$')
 plt.show()
-plt.savefig('Eigenvalues.png')
+fig.savefig('Eigenvalues.png')
 print(w)
 print((1-beta-gamma))
 print(1-beta)
