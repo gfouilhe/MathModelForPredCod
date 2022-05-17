@@ -40,30 +40,30 @@ for name, p in model.named_parameters():
     if name=='fcCB.weight':
         Wcb = p.detach().numpy()
 
-good_params = []
-for beta in betaR:
-    for i, gamma in enumerate(gammaR):
-        if beta + gamma > 1:
-            pass
-        else:
-            d = 196
+# good_params = []
+# for beta in betaR:
+#     for i, gamma in enumerate(gammaR):
+#         if beta + gamma > 1:
+#             pass
+#         else:
+#             d = 196
 
-            A11 = (1-beta-gamma) * np.eye(d)
-            A12 = beta * Wba
-            A13 = np.zeros((d,d))
-            A21 = (1-beta-gamma) * gamma * Wba.T + alpha/d * Wba.T
-            A22 = gamma * beta * Wab.dot(Wba) + (1-beta-gamma) * np.eye(d) - alpha/d * Wba.T.dot(Wba)
-            A23 = beta * Wcb
-            A31 = (1-beta-gamma) * gamma**2 * Wbc.dot(Wab) + alpha/d * gamma * Wbc.dot(Wcb.T)
-            A32 = beta * gamma **2 * Wab.dot(Wba) + (1-beta-gamma) * gamma * Wbc - alpha/d * gamma * Wbc.dot(Wba.T.dot(Wba)) + alpha/d * Wcb.T
-            A33 = beta * gamma * Wbc * Wcb + (1-gamma) * np.eye(d) - alpha/d * Wcb.T.dot(Wcb)
-            A = np.block([[A11,A12,A13],[A21,A22,A23],[A31,A32,A33]])
+#             A11 = (1-beta-gamma) * np.eye(d)
+#             A12 = beta * Wba
+#             A13 = np.zeros((d,d))
+#             A21 = (1-beta-gamma) * gamma * Wba.T + alpha/d * Wba.T
+#             A22 = gamma * beta * Wab.dot(Wba) + (1-beta-gamma) * np.eye(d) - alpha/d * Wba.T.dot(Wba)
+#             A23 = beta * Wcb
+#             A31 = (1-beta-gamma) * gamma**2 * Wbc.dot(Wab) + alpha/d * gamma * Wbc.dot(Wcb.T)
+#             A32 = beta * gamma **2 * Wab.dot(Wba) + (1-beta-gamma) * gamma * Wbc - alpha/d * gamma * Wbc.dot(Wba.T.dot(Wba)) + alpha/d * Wcb.T
+#             A33 = beta * gamma * Wbc * Wcb + (1-gamma) * np.eye(d) - alpha/d * Wcb.T.dot(Wcb)
+#             A = np.block([[A11,A12,A13],[A21,A22,A23],[A31,A32,A33]])
 
-            w,_ = eigs(A,k=1) # ie spectral radius
-            RhoCloseToOne(w,good_params,beta,gamma,tol = 10**-3)
+#             w,_ = eigs(A,k=1,which='LM',tol=10**-5) # ie spectral radius
+#             RhoCloseToOne(w,good_params,beta,gamma,tol = 10**-3)
 
 
-np.save(os.path.join('oscillations_parameters_setup','good_params.npy'),good_params)
+# np.save(os.path.join('oscillations_parameters_setup','good_params.npy'),good_params)
 
 
 good_params = np.load(os.path.join('oscillations_parameters_setup','good_params.npy'))  
@@ -98,16 +98,17 @@ for beta,gamma in good_params:
         else:
             osci_eigv.append((beta,gamma,v[i]))
 inv = np.linalg.inv(Win)
-print(good_params)
 
 osci_imgs = [(beta,gamma,inv.dot(y[:196].astype('float64')-Winb)) for beta,gamma,y in osci_eigv]
-print('osci :', osci_imgs)
 
-unflattened_imgs = dict([(f"im{i})",(img[0],img[1],img[2].reshape((14,14)))) for i, img in enumerate(osci_imgs)])
+unflattened_imgs = dict([(f"im{i})",(img[0],img[1],img[2].reshape((14,14)))) for i, img in enumerate(osci_imgs)]) #img[0:1] are parameters beta and gamma
 with open(os.path.join('oscillations_parameters_setup','params_dictionary.pkl'), 'wb') as f:
     pickle.dump(unflattened_imgs, f)
 
-for i,img in enumerate(unflattened_imgs):
+unflattened_imgs_list = [img for _,img in unflattened_imgs.items()]
+print(len(unflattened_imgs_list))
+for i,img in enumerate(unflattened_imgs_list):
     _,_,img = img
     plt.imsave(os.path.join('oscillations_parameters_setup',f'img{i}.png'),img, cmap='gray')
+
 
