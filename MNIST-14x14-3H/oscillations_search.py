@@ -36,9 +36,13 @@ for name, p in model.named_parameters():
     if name=='fcin.bias':
         Winb = tmp
     if name=='fcBC.weight':
-        Wbc = p.detach().numpy()
+        Wbc = tmp
     if name=='fcCB.weight':
-        Wcb = p.detach().numpy()
+        Wcb = tmp
+    if name=='fcCD.weight':
+        Wcd = tmp
+    if name=='fcDC.weight':
+        Wdc = tmp
 
 # good_params = []
 # for beta in betaR:

@@ -23,7 +23,7 @@ print('Mean FB : ', getMean(acc,mode='fb'))
 
 
 
-# path = os.path.join('accuracies','accTrainingFFCE.npy')
-# acc = np.load(path)
+path = os.path.join('accuracies','accTrainingFFCE.npy')
+acc = np.load(path)
 
-# print('Mean FF : ', getMean(acc))
+print('Mean FF : ', getMean(acc))
