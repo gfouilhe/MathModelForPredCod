@@ -12,7 +12,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
 def RhoCloseToOne(rho,l,beta,gamma,tol = 10**-4):
     if abs(1-rho) < tol:
-        return l.append((beta,gamma))
+        l.append((beta,gamma))
 
 
 alpha = 0.01

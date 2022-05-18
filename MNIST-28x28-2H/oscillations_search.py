@@ -12,7 +12,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 def RhoCloseToOne(w,l,beta,gamma,tol = 10**-4):
     rho = np.max(abs(w))
     if abs(1-rho) < tol:
-        return l.append((beta,gamma))
+        l.append((beta,gamma))
 
 
 alpha = 0.01

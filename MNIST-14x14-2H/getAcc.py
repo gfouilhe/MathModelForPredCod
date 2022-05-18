@@ -21,6 +21,13 @@ acc = np.load(path)
 
 print('Mean FB : ', getMean(acc,mode='fb'))
 
+path = os.path.join('accuracies','accTrainingCEbefore.npy')
+acc = np.load(path)
+
+
+
+print('Mean FB : ', getMean(acc,mode='fb'))
+
 
 
 # path = os.path.join('accuracies','accTrainingFFCE.npy')
