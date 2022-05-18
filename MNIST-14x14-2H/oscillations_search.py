@@ -10,7 +10,7 @@ from scipy.sparse.linalg import eigs
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
 
-def RhoCloseToOne(rho,l,over,under,beta,gamma,tol = 10**-3):
+def RhoCloseToOne(rho,l,over,under,beta,gamma,tol = 10**-2):
     rho = abs(rho)
     if abs(1-rho) < tol:
         l.append((beta,gamma))
@@ -19,7 +19,7 @@ def RhoCloseToOne(rho,l,over,under,beta,gamma,tol = 10**-3):
     else:
         under.append((beta,gamma))
 
-for alpha in [0.01,0.02,0.05,0.1,0.25,0.5]:
+for alpha in [0.01,0.05,0.1,0.25]:
 
     betaR = list(np.arange(0,1,0.005))[1:]
     gammaR = list(np.arange(0,1,0.005))[1:]
@@ -57,8 +57,8 @@ for alpha in [0.01,0.02,0.05,0.1,0.25,0.5]:
                 A22 = gamma * beta * Wab.dot(Wba) + (1-gamma) * np.eye(d) - alpha/d * Wba.T.dot(Wba)
                 A = np.block([[A11,A12],[A21,A22]])
 
-                rho,_ = eigs(A,k=1,which='LM',tol=10**-5) # ie spectral radius
-                RhoCloseToOne(rho,good_params,over_one,under_one,beta,gamma,tol = 10**-3)
+                rho,_ = eigs(A,k=1,which='LM',tol=10**-3) # ie spectral radius
+                RhoCloseToOne(rho,good_params,over_one,under_one,beta,gamma,tol = 10**-2)
 
 
     np.save(os.path.join('oscillations_parameters_setup',f'good_params_{alpha}.npy'),good_params)
@@ -98,14 +98,14 @@ for alpha in [0.01,0.02,0.05,0.1,0.25,0.5]:
 
         w, v = np.linalg.eig(A)
         for i,eig in enumerate(w):
-            if np.isreal(eig) or abs(1-abs(eig)) >= 10**-3 : 
+            if np.isreal(eig) or abs(1-abs(eig)) >= 10**-2 : 
                 pass
             else:
                 #print(eig)
                 osci_eigv.append((beta,gamma,v[i]))
     inv = np.linalg.inv(Win)
 
-    osci_imgs = [(beta,gamma,inv.dot(y[:196].astype('float64')-Winb)) for beta,gamma,y in osci_eigv]
+    osci_imgs = [(beta,gamma,inv.dot(np.real(y[:196])-Winb)) for beta,gamma,y in osci_eigv]
 
     unflattened_imgs = dict([(f"im{i})",(img[0],img[1],img[2].reshape((14,14)))) for i, img in enumerate(osci_imgs)]) #img[0:1] are parameters beta and gamma
     with open(os.path.join('oscillations_parameters_setup',f'params_dictionary_{alpha}.pkl'), 'wb') as f:

@@ -13,7 +13,7 @@ normA = []
 normB = []
 normO = []
 
-for alpha in [0.01,0.02,0.05,0.1,0.25,0.5]:
+for alpha in [0.01,0.05,0.1,0.25]:
     with open(os.path.join('oscillations_parameters_setup',f'params_dictionary_{alpha}.pkl'), 'rb') as f:
         params_and_imgs = pickle.load(f)
 
@@ -47,17 +47,29 @@ for alpha in [0.01,0.02,0.05,0.1,0.25,0.5]:
 # actB = np.linalg.norm(actB,axis=2)
 # actO = np.linalg.norm(actO,axis=2)
 
-for i, _ in enumerate(params_list):
-    for j,alpha in [0.01,0.02,0.05,0.1,0.25,0.5]:
-        plt.figure(figsize=(15,5))
-        plt.subplot(1,3,1)
-        plt.plot(normA[j][i])
-        plt.subplot(1,3,2)
-        plt.plot(normB[j][i])
-        plt.subplot(1,3,3)
-        plt.plot(normO[j][i])
-        plt.savefig(os.path.join('oscillations_attempt_plot_norm',f'img_{alpha}_{i}'))
-        plt.close()
+
+for j,alpha in enumerate([0.01,0.05,0.1,0.25]):
+    with open(os.path.join('oscillations_parameters_setup',f'params_dictionary_{alpha}.pkl'), 'rb') as f:
+        params_and_imgs = pickle.load(f)
+    params_list = [param for _,param in params_and_imgs.items()]
+    for i, _ in enumerate(params_list):
+
+        nA = normA[j]
+        nB = normB[j]
+        nO = normO[j]
+        if np.size(normA[j])==0:
+            pass
+        else:
+            print(nA.shape)
+            plt.figure(figsize=(15,5))
+            plt.subplot(1,3,1)
+            plt.plot(nA[i])
+            plt.subplot(1,3,2)
+            plt.plot(nB[i])
+            plt.subplot(1,3,3)
+            plt.plot(nO[i])
+            plt.savefig(os.path.join('oscillations_attempt_plot_norm',f'actplot_{alpha}_{i}.png'))
+            plt.close()
 
 
 
