@@ -49,17 +49,20 @@ A22 = gamma * beta * W12.dot(W21) + (1-gamma) * np.eye(d) - alpha/d * W21.T.dot(
 
 A_hand = np.block([[A11,A12],[A21,A22]])
 
-assert A == A_hand
+print(np.max(A-A_hand))
 
 w, v = np.linalg.eig(A)
-plt.figure()
+ax = plt.gca()
+fig = plt.gcf()
+ax.cla()
+circle = plt.Circle((0,0),1,color='r',fill=False)
+ax.add_patch(circle)
 for eig in w:
     re = np.real(eig)
     im = np.imag(eig)
-    plt.scatter(re,im)
+    ax.plot(re,im,'o',color='blue')
 
-
-plt.show()
+plt.show()  
 
 # alpha = 0.01
 # beta = 0.33
