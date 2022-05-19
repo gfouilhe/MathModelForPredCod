@@ -16,20 +16,40 @@ model= PCMLP(0.33,alpha,beta,gamma)
 checkpointPhase = torch.load(os.path.join('models',f"PC_E19_I4.pth"))
 model.load_state_dict(checkpointPhase["module"])
 for name, p in model.named_parameters():
+    tmp = p.detach().numpy()
     if name=='fcAB.weight':
-        Wab = p.detach().numpy()
+        W12 = p.detach().numpy()
     if name=='fcBA.weight':
-        Wba = p.detach().numpy()
+        W21 = p.detach().numpy()
+    if name=='fciA.weight':
+        W01 = p.detach().numpy()
+    if name=='fcAi.weight':
+        W10 = p.detach().numpy()
 
-d = 120
-Wab = np.eye(d)
-Wba = np.eye(d)
+
+d = W12.shape[1]
+Z = np.zeros((d,d))
+Wf = np.block([[Z,Z],[W12,Z]])
+Wb = np.block([[Z,W21],[Z,Z]])
+IdJ = np.eye(2*d)
+Id = np.eye(d)
+
+M1 = np.linalg.inv((IdJ-gamma*Wf))
+
+D = np.block([[(1-beta-gamma)*Id,Z],[Z,(1-gamma)*Id]])
+E = np.block([[-W10.T.dot(W10),Z],[W21.T,-W21.T.dot(W21)]])
+M2 = beta*Wb + D + alpha/d * E
+
+A = M1.dot(M2)
 
 A11 = (1-beta-gamma) * np.eye(d)
-A12 = beta * Wba
-A21 = (1-beta-gamma) * gamma * Wab + alpha/d * Wba.T
-A22 = gamma * beta * Wab.dot(Wba) + (1-gamma) * np.eye(d) - alpha/d * Wba.T.dot(Wba)
-A = np.block([[A11,A12],[A21,A22]])
+A12 = beta * W21
+A21 = (1-beta-gamma) * gamma * W12 + alpha/d * W21.T
+A22 = gamma * beta * W12.dot(W21) + (1-gamma) * np.eye(d) - alpha/d * W21.T.dot(W21)
+
+A_hand = np.block([[A11,A12],[A21,A22]])
+
+assert A == A_hand
 
 w, v = np.linalg.eig(A)
 plt.figure()
@@ -40,11 +60,7 @@ for eig in w:
 
 
 plt.show()
-print(w)
-print((1-beta-gamma))
-print(1-beta)
 
-# #%%
 # alpha = 0.01
 # beta = 0.33
 # gamma = 0.33
