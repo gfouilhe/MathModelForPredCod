@@ -60,7 +60,6 @@ for j,alpha in enumerate([0.01,0.05,0.1,0.25]):
         if np.size(normA[j])==0:
             pass
         else:
-            print(nA.shape)
             plt.figure(figsize=(15,5))
             plt.subplot(1,3,1)
             plt.plot(nA[i])
