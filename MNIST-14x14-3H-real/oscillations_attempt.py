@@ -57,6 +57,7 @@ for j,alpha in enumerate([0.01,0.05,0.1,0.25]):
         nA = normA[j]
         nB = normB[j]
         nO = normO[j]
+
         if np.size(normA[j])==0:
             pass
         else:
