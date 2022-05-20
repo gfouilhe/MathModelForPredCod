@@ -18,10 +18,10 @@ class PCMLP(nn.Module):
         
         super(PCMLP,self).__init__()
 
-        self.gammaFw = gammaFw * torch.ones(1)
-        self.alphaRec = alphaRec * torch.ones(1)
-        self.betaFB = betaFB * torch.ones(1)
-        self.memory = memory * torch.ones(1)
+        self.gammaFw = gammaFw * torch.ones(1).cuda()
+        self.alphaRec = alphaRec * torch.ones(1).cuda()
+        self.betaFB = betaFB * torch.ones(1).cuda()
+        self.memory = memory * torch.ones(1).cuda()
         self.num_hidden = 196
         self.fciA = nn.Linear(self.num_hidden,self.num_hidden)
         self.fcAi = nn.Linear(self.num_hidden,self.num_hidden)
