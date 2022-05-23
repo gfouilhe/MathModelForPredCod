@@ -30,11 +30,10 @@ for gamma, beta in gamma_beta_couples:
         betaR = list(np.arange(0,1,0.01))[1:]
         gammaR = list(np.arange(0,1,0.01))[1:]
 
-        threshold = []
-
-        model= PCMLP(0.33,alpha,gamma,beta)
+        model= PCMLP(0.33,alpha,beta,gamma)
         
         checkpointPhase = torch.load(os.path.join('models',f"PC_E19_I0_G{gamma}_B{beta}_A{alpha}.pth"))
+        print(gamma,beta,alpha)
         model.load_state_dict(checkpointPhase["module"])
         for name, p in model.named_parameters():
             tmp = p.detach().numpy()
@@ -52,28 +51,28 @@ for gamma, beta in gamma_beta_couples:
         under_one = []
         d = W12.shape[1]
 
-        for beta in betaR:
-            for i, gamma in enumerate(gammaR):
-                if beta + gamma > 1:
+        for betab in betaR:
+            for i, gammab in enumerate(gammaR):
+                if betab + gammab > 1:
                     pass
                 else:
                 
 
-                    A11 = (1-beta-gamma) * np.eye(d)
-                    A12 = beta * W21
-                    A21 = (1-beta-gamma) * gamma * W12 + alpha/d * W21.T
-                    A22 = gamma * beta * W12.dot(W21) + (1-gamma) * np.eye(d) - alpha/d * W21.T.dot(W21)
+                    A11 = (1-betab-gammab) * np.eye(d)
+                    A12 = betab * W21
+                    A21 = (1-betab-gammab) * gammab * W12 + alpha/d * W21.T
+                    A22 = gammab * betab * W12.dot(W21) + (1-gammab) * np.eye(d) - alpha/d * W21.T.dot(W21)
 
                     A = np.block([[A11,A12],[A21,A22]])
 
                     rho,_ = eigs(A,k=1,which='LM',tol=10**-3) # ie spectral radius
-                    RhoCloseToOne(rho,good_params,over_one,under_one,beta,gamma,tol = 10**-3)
+                    RhoCloseToOne(rho,good_params,over_one,under_one,betab,gammab,tol = 10**-3)
 
-
+        print(gamma,beta,alpha)
         np.save(os.path.join('oscillations_parameters_setup',f'good_params_G{gamma}_B{beta}_A{alpha}.npy'),good_params)
         np.save(os.path.join('oscillations_parameters_setup',f'over_params_G{gamma}_B{beta}_A{alpha}.npy'),over_one)
         np.save(os.path.join('oscillations_parameters_setup',f'under_params_G{gamma}_B{beta}_A{alpha}.npy'),under_one)
-
+        
 
         good_params = np.load(os.path.join('oscillations_parameters_setup',f'good_params_G{gamma}_B{beta}_A{alpha}.npy'))
         over_one = np.load(os.path.join('oscillations_parameters_setup',f'over_params_G{gamma}_B{beta}_A{alpha}.npy'))
@@ -86,6 +85,7 @@ for gamma, beta in gamma_beta_couples:
             plt.scatter(*zip(*good_params),color='red',label='$\\rho = 1$')
         x = np.linspace(0,1,100)
         plt.plot(x,1-x,linestyle='dashed',label='$\lambda+\\beta = 1$',color='red')
+        plt.scatter(beta,gamma,marker='x',label='Hyperparameters used for training')
         plt.xlabel('$\lambda$')
         plt.xlim((0,1))
         plt.ylim((0,1))
@@ -96,13 +96,13 @@ for gamma, beta in gamma_beta_couples:
         plt.close()
 
         osci_eigv = []
-        for beta,gamma in good_params:
+        for betab,gammab in good_params:
             
 
-            A11 = (1-beta-gamma) * np.eye(d)
-            A12 = beta * W21
-            A21 = (1-beta-gamma) * gamma * W12 + alpha/d * W21.T
-            A22 = gamma * beta * W12.dot(W21) + (1-gamma) * np.eye(d) - alpha/d * W21.T.dot(W21)
+            A11 = (1-betab-gammab) * np.eye(d)
+            A12 = betab * W21
+            A21 = (1-betab-gammab) * gammab * W12 + alpha/d * W21.T
+            A22 = gammab * betab * W12.dot(W21) + (1-gammab) * np.eye(d) - alpha/d * W21.T.dot(W21)
             A = np.block([[A11,A12],[A21,A22]])
 
             w, v = np.linalg.eig(A)
@@ -111,9 +111,9 @@ for gamma, beta in gamma_beta_couples:
                     pass
                 else:
                     #print(eig)
-                    osci_eigv.append((beta,gamma,v[i]))
+                    osci_eigv.append((betab,gammab,v[i]))
 
-        osci_imgs = [(beta,gamma,np.real(y[:196])) for beta,gamma,y in osci_eigv]
+        osci_imgs = [(betab,gammab,np.real(y[:196])) for betab,gammab,y in osci_eigv]
 
         unflattened_imgs = dict([(f"im{i})",(img[0],img[1],img[2].reshape((14,14)))) for i, img in enumerate(osci_imgs)]) #img[0:1] are parameters beta and gamma
         with open(os.path.join('oscillations_parameters_setup',f'params_dictionary_G{gamma}_B{beta}_A{alpha}.pkl'), 'wb') as f:
@@ -124,3 +124,4 @@ for gamma, beta in gamma_beta_couples:
         # for i,img in enumerate(unflattened_imgs_list):
         #     _,_,img = img
         #     plt.imsave(os.path.join('oscillations_parameters_setup',f'img_{alpha}_{i}.png'),img, cmap='gray')
+        print(gamma,beta,alpha)
