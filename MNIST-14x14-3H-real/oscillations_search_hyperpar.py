@@ -1,4 +1,3 @@
-from sympy import unflatten
 import torch
 from model import PCMLP
 import os
@@ -82,7 +81,8 @@ for gamma, beta in gamma_beta_couples:
         plt.figure()
         plt.scatter(*zip(*over_one),color='blue',label='$\\rho > 1$')
         plt.scatter(*zip(*under_one),color='green',label='$\\rho < 1$')
-        if good_params:
+        
+        if not len(good_params) == 0:
             plt.scatter(*zip(*good_params),color='red',label='$\\rho = 1$')
         x = np.linspace(0,1,100)
         plt.plot(x,1-x,linestyle='dashed',label='$\lambda+\\beta = 1$',color='red')
