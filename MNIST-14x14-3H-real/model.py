@@ -14,7 +14,7 @@ class PCMLP(nn.Module):
 
     
     '''
-    def __init__(self, memory, alphaRec, betaFB, gammaFw,linear=False):
+    def __init__(self, memory, alphaRec, betaFB, gammaFw,linear=False,transp=False):
         
         super(PCMLP,self).__init__()
 
@@ -33,6 +33,8 @@ class PCMLP(nn.Module):
         self.activation = F.relu
         if linear:
             self.activation = lambda x: x
+        self.transp = transp
+
 
     def forward(self, i, a, b, o, networkMode):
 
@@ -65,16 +67,28 @@ class PCMLP(nn.Module):
                 gammaFw = torch.sigmoid(self.gammaFw) / den
                 betaBw = torch.sigmoid(self.betaFB) / den
 
-            errorI = nn.functional.mse_loss(self.fcAi(a), i)
-            reconstructionI = torch.autograd.grad(errorI, a, retain_graph=True)[0]
+            if self.transp:
+                errorI = nn.functional.mse_loss(torch.matmul(a, self.fciA.weight), i)
+                reconstructionI = torch.autograd.grad(errorI, a, retain_graph=True)[0]
 
-            errorA = nn.functional.mse_loss(self.fcBA(b), a)
-            reconstructionA = torch.autograd.grad(errorA, b, retain_graph=True)[0]
+                errorA = nn.functional.mse_loss(torch.matmul(b, self.fcAB.weight), a)
+                reconstructionA = torch.autograd.grad(errorA, b, retain_graph=True)[0]
 
 
-            aNew = gammaFw * self.activation(self.fciA(i)) + (1 - gammaFw - betaBw) * a + betaBw * self.activation(self.fcBA(b)) - self.alphaRec * batchSize * reconstructionI
-            bNew = gammaFw * self.activation(self.fcAB(aNew)) + + (1 - gammaFw) * b - self.alphaRec * batchSize * reconstructionA
-            oNew = self.fcout(bNew)
+                aNew = gammaFw * self.activation(self.fciA(i)) + (1 - gammaFw - betaBw) * a + betaBw * self.activation(torch.matmul(b, self.fcAB.weight)) - self.alphaRec * batchSize * reconstructionI
+                bNew = gammaFw * self.activation(self.fcAB(aNew)) + + (1 - gammaFw) * b - self.alphaRec * batchSize * reconstructionA
+                oNew = self.fcout(bNew)
+            else:
+                errorI = nn.functional.mse_loss(self.fcAi(a), i)
+                reconstructionI = torch.autograd.grad(errorI, a, retain_graph=True)[0]
+
+                errorA = nn.functional.mse_loss(self.fcBA(b), a)
+                reconstructionA = torch.autograd.grad(errorA, b, retain_graph=True)[0]
+
+
+                aNew = gammaFw * self.activation(self.fciA(i)) + (1 - gammaFw - betaBw) * a + betaBw * self.activation(self.fcBA(b)) - self.alphaRec * batchSize * reconstructionI
+                bNew = gammaFw * self.activation(self.fcAB(aNew)) + + (1 - gammaFw) * b - self.alphaRec * batchSize * reconstructionA
+                oNew = self.fcout(bNew)
 
         out =  torch.log_softmax(oNew,dim=1)
         return out, i, aNew, bNew,  oNew, reconstructionA
