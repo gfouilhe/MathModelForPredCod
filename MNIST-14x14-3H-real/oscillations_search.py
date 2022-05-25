@@ -1,4 +1,4 @@
-from sympy import unflatten
+
 import torch
 from model import PCMLP
 import os
@@ -19,7 +19,7 @@ def RhoCloseToOne(rho,l,over,under,beta,gamma,tol = 10**-2):
     else:
         under.append((beta,gamma))
 
-for alpha in [0.01,0.05,0.1,0.25]:
+for alpha in [0.01]: #,0.05,0.1,0.25]:
 
     betaR = list(np.arange(0,1,0.005))[1:]
     gammaR = list(np.arange(0,1,0.005))[1:]
@@ -27,7 +27,7 @@ for alpha in [0.01,0.05,0.1,0.25]:
     threshold = []
 
     model= PCMLP(0.33,alpha,0.5,0.2)
-    checkpointPhase = torch.load(os.path.join('models',f"PC_E19_I4.pth"))
+    checkpointPhase = torch.load(os.path.join('models',f"PCT_E19_I0_G0.6_B0.2_A0.01.pth"))
     model.load_state_dict(checkpointPhase["module"])
     for name, p in model.named_parameters():
         tmp = p.detach().numpy()
@@ -40,6 +40,8 @@ for alpha in [0.01,0.05,0.1,0.25]:
         if name=='fcAi.weight':
             W10 = p.detach().numpy()
 
+    W21 = W12.T
+    W10 = W01.T
     good_params = []
     over_one = []
     under_one = []
@@ -61,17 +63,17 @@ for alpha in [0.01,0.05,0.1,0.25]:
                 A = np.block([[A11,A12],[A21,A22]])
 
                 rho,_ = eigs(A,k=1,which='LM',tol=10**-3) # ie spectral radius
-                RhoCloseToOne(rho,good_params,over_one,under_one,beta,gamma,tol = 10**-3)
+                RhoCloseToOne(rho,good_params,over_one,under_one,beta,gamma,tol = 10**-2)
 
 
-    np.save(os.path.join('oscillations_parameters_setup',f'good_params_{alpha}.npy'),good_params)
-    np.save(os.path.join('oscillations_parameters_setup',f'over_params_{alpha}.npy'),over_one)
-    np.save(os.path.join('oscillations_parameters_setup',f'under_params_{alpha}.npy'),under_one)
+    np.save(os.path.join('oscillations_parameters_setup',f'Tgood_params_{alpha}.npy'),good_params)
+    np.save(os.path.join('oscillations_parameters_setup',f'Tover_params_{alpha}.npy'),over_one)
+    np.save(os.path.join('oscillations_parameters_setup',f'Tunder_params_{alpha}.npy'),under_one)
 
 
-    good_params = np.load(os.path.join('oscillations_parameters_setup',f'good_params_{alpha}.npy'))
-    over_one = np.load(os.path.join('oscillations_parameters_setup',f'over_params_{alpha}.npy'))
-    under_one =  np.load(os.path.join('oscillations_parameters_setup',f'under_params_{alpha}.npy'))
+    good_params = np.load(os.path.join('oscillations_parameters_setup',f'Tgood_params_{alpha}.npy'))
+    over_one = np.load(os.path.join('oscillations_parameters_setup',f'Tover_params_{alpha}.npy'))
+    under_one =  np.load(os.path.join('oscillations_parameters_setup',f'Tunder_params_{alpha}.npy'))
     plt.figure()
     plt.scatter(*zip(*over_one),color='blue',label='rho > 1')
     plt.scatter(*zip(*under_one),color='green',label='rho < 1')
@@ -84,7 +86,7 @@ for alpha in [0.01,0.05,0.1,0.25]:
     plt.ylabel('$\\beta$')
     plt.title(f'Potential oscillations for $\\alpha = {alpha}$')
     plt.legend()
-    plt.savefig(os.path.join('oscillations_parameters_setup',f'potential_good_parameters_{alpha}.png'))
+    plt.savefig(os.path.join('oscillations_parameters_setup',f'Tpotential_good_parameters_{alpha}.png'))
     plt.close()
 
     osci_eigv = []
@@ -108,11 +110,11 @@ for alpha in [0.01,0.05,0.1,0.25]:
     osci_imgs = [(beta,gamma,np.real(y[:196])) for beta,gamma,y in osci_eigv]
 
     unflattened_imgs = dict([(f"im{i})",(img[0],img[1],img[2].reshape((14,14)))) for i, img in enumerate(osci_imgs)]) #img[0:1] are parameters beta and gamma
-    with open(os.path.join('oscillations_parameters_setup',f'params_dictionary_{alpha}.pkl'), 'wb') as f:
+    with open(os.path.join('oscillations_parameters_setup',f'Tparams_dictionary_{alpha}.pkl'), 'wb') as f:
         pickle.dump(unflattened_imgs, f)
 
     unflattened_imgs_list = [img for _,img in unflattened_imgs.items()]
     print(len(unflattened_imgs_list))
     for i,img in enumerate(unflattened_imgs_list):
         _,_,img = img
-        plt.imsave(os.path.join('oscillations_parameters_setup',f'img_{alpha}_{i}.png'),img, cmap='gray')
+        plt.imsave(os.path.join('oscillations_parameters_setup',f'Timg_{alpha}_{i}.png'),img, cmap='gray')
