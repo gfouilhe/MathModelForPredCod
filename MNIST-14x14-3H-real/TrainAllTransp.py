@@ -14,9 +14,9 @@ from getdata import get_data
 import os
 
 
-gammaFw = 0.6
+gammaFw = 0.33
 alphaRec = 0.01
-betaFB = 0.2
+betaFB = 0.33
 
 
 iterationNumber = 1

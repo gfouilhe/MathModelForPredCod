@@ -9,22 +9,22 @@ os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
 
 alpha = 0.01
-beta = 0.5
-gamma = 0.2
+beta = 0.33
+gamma = 0.33
 mem = 0.33
 model= PCMLP(0.33,alpha,beta,gamma)
-checkpointPhase = torch.load(os.path.join('models',f"PCT_E19_I0_G0.6_B0.2_A0.01.pth")) #PCT_E19_I0_G0.6_B0.2_A0.01
+checkpointPhase = torch.load(os.path.join('models',f"PCT_E19_I0_G0.33_B0.33_A0.01.pth")) #PCT_E19_I0_G0.6_B0.2_A0.01
 model.load_state_dict(checkpointPhase["module"])
 for name, p in model.named_parameters():
     tmp = p.detach().numpy()
     if name=='fcAB.weight':
-        W12 = p.detach().numpy()
+        W12 = tmp
     if name=='fcBA.weight':
-        W21 = p.detach().numpy()
+        W21 = tmp
     if name=='fciA.weight':
-        W01 = p.detach().numpy()
+        W01 = tmp
     if name=='fcAi.weight':
-        W10 = p.detach().numpy()
+        W10 = tmp
 
 W21 = W12.T
 W10 = W01.T

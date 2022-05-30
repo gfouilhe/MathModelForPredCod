@@ -1,4 +1,5 @@
-from TrainAll import main as train
+# from TrainAll import main as train
+from TrainAllTransp import main as train
 
 def main():
     
@@ -7,7 +8,7 @@ def main():
     timeSteps = 30
 
     gamma_beta_couples = [(0.1,0.7),(0.25,0.5),(0.33,0.33),(0.5,0.25),(0.7,0.1)]
-    alpha_range = [0.01,0.05,0.1,0.5]
+    alpha_range = [0.01] #,0.05,0.1,0.5]
 
     for gammaFw,betaFB in gamma_beta_couples:
         for alphaRec in alpha_range:
