@@ -19,7 +19,7 @@ def RhoCloseToOne(rho,l,over,under,beta,gamma,tol = 10**-2):
         under.append((beta,gamma))
 
 gamma_beta_couples = [(0.1,0.7),(0.25,0.5),(0.33,0.33),(0.5,0.25),(0.7,0.1)]
-alpha_range = [0.01,0.05,0.1,0.5]
+alpha_range = [0.01]#,0.05,0.1,0.5]
 it = 0
 for gamma, beta in gamma_beta_couples:
     for alpha in alpha_range:
@@ -32,7 +32,7 @@ for gamma, beta in gamma_beta_couples:
 
         model= PCMLP(0.33,alpha,beta,gamma)
         
-        checkpointPhase = torch.load(os.path.join('models',f"PC_E19_I0_G{gamma}_B{beta}_A{alpha}.pth"))
+        checkpointPhase = torch.load(os.path.join('models',f"PCT_E19_I0_G{gamma}_B{beta}_A{alpha}.pth"))
         print(gamma,beta,alpha)
         model.load_state_dict(checkpointPhase["module"])
         for name, p in model.named_parameters():
@@ -69,14 +69,14 @@ for gamma, beta in gamma_beta_couples:
                     RhoCloseToOne(rho,good_params,over_one,under_one,betab,gammab,tol = 10**-3)
 
         print(gamma,beta,alpha)
-        np.save(os.path.join('oscillations_parameters_setup',f'good_params_G{gamma}_B{beta}_A{alpha}.npy'),good_params)
-        np.save(os.path.join('oscillations_parameters_setup',f'over_params_G{gamma}_B{beta}_A{alpha}.npy'),over_one)
-        np.save(os.path.join('oscillations_parameters_setup',f'under_params_G{gamma}_B{beta}_A{alpha}.npy'),under_one)
+        np.save(os.path.join('oscillations_parameters_setup',f'Tgood_params_G{gamma}_B{beta}_A{alpha}.npy'),good_params)
+        np.save(os.path.join('oscillations_parameters_setup',f'Tover_params_G{gamma}_B{beta}_A{alpha}.npy'),over_one)
+        np.save(os.path.join('oscillations_parameters_setup',f'Tunder_params_G{gamma}_B{beta}_A{alpha}.npy'),under_one)
         
 
-        good_params = np.load(os.path.join('oscillations_parameters_setup',f'good_params_G{gamma}_B{beta}_A{alpha}.npy'))
-        over_one = np.load(os.path.join('oscillations_parameters_setup',f'over_params_G{gamma}_B{beta}_A{alpha}.npy'))
-        under_one =  np.load(os.path.join('oscillations_parameters_setup',f'under_params_G{gamma}_B{beta}_A{alpha}.npy'))
+        good_params = np.load(os.path.join('oscillations_parameters_setup',f'Tgood_params_G{gamma}_B{beta}_A{alpha}.npy'))
+        over_one = np.load(os.path.join('oscillations_parameters_setup',f'Tover_params_G{gamma}_B{beta}_A{alpha}.npy'))
+        under_one =  np.load(os.path.join('oscillations_parameters_setup',f'Tunder_params_G{gamma}_B{beta}_A{alpha}.npy'))
         plt.figure()
         plt.scatter(*zip(*over_one),color='blue',label='$\\rho > 1$')
         plt.scatter(*zip(*under_one),color='green',label='$\\rho < 1$')
@@ -92,7 +92,7 @@ for gamma, beta in gamma_beta_couples:
         plt.ylabel('$\\beta$')
         plt.title(f'Potential oscillations for $\\alpha = {alpha}$')
         plt.legend()
-        plt.savefig(os.path.join('oscillations_parameters_setup',f'potential_good_parameters_G{gamma}_B{beta}_A{alpha}.png'))
+        plt.savefig(os.path.join('oscillations_parameters_setup',f'Tpotential_good_parameters_G{gamma}_B{beta}_A{alpha}.png'))
         plt.close()
 
         osci_eigv = []
@@ -116,7 +116,7 @@ for gamma, beta in gamma_beta_couples:
         osci_imgs = [(betab,gammab,np.real(y[:196])) for betab,gammab,y in osci_eigv]
 
         unflattened_imgs = dict([(f"im{i})",(img[0],img[1],img[2].reshape((14,14)))) for i, img in enumerate(osci_imgs)]) #img[0:1] are parameters beta and gamma
-        with open(os.path.join('oscillations_parameters_setup',f'params_dictionary_G{gamma}_B{beta}_A{alpha}.pkl'), 'wb') as f:
+        with open(os.path.join('oscillations_parameters_setup',f'Tparams_dictionary_G{gamma}_B{beta}_A{alpha}.pkl'), 'wb') as f:
             pickle.dump(unflattened_imgs, f)
 
         unflattened_imgs_list = [img for _,img in unflattened_imgs.items()]
