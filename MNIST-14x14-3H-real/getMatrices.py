@@ -12,19 +12,25 @@ alpha = 0.01
 beta = 0.5
 gamma = 0.2
 mem = 0.33
-model= PCMLP(0.33,alpha,beta,gamma)
-checkpointPhase = torch.load(os.path.join('models',f"PC_E19_I4.pth"))
+model= PCMLP(0.33,alpha,beta,gamma,complex_valued=True)
+checkpointPhase = torch.load(os.path.join('models',f"APCC_E19_I0_G0.6_B0.2_A0.01.pth"))
 model.load_state_dict(checkpointPhase["module"])
 for name, p in model.named_parameters():
+    print(name)
+    # if name=='fciA.fc_r.weight':
+    #     print(p.detach().numpy().shape)
+    # if name=='fciA.fc_i.weight':
+    #     print(p.detach().numpy().shape)
+    
     tmp = p.detach().numpy()
     if name=='fcAB.weight':
-        W12 = p.detach().numpy()
+        W12 = tmp
     if name=='fcBA.weight':
-        W21 = p.detach().numpy()
+        W21 = tmp
     if name=='fciA.weight':
-        W01 = p.detach().numpy()
+        W01 = tmp
     if name=='fcAi.weight':
-        W10 = p.detach().numpy()
+        W10 = tmp
 
 
 d = W12.shape[1]
@@ -72,13 +78,13 @@ plt.show()
 # model.load_state_dict(checkpointPhase["module"])
 # for name, p in model.named_parameters():
 #     if name=='fcAB.weight':
-#         Wab = p.detach().numpy()
+#         Wab = tmp
 #     if name=='fcBA.weight':
-#         Wba = p.detach().numpy()
+#         Wba = tmp
 #     if name=='fcBC.weight':
-#         Wbc = p.detach().numpy()
+#         Wbc = tmp
 #     if name=='fcCB.weight':
-#         Wcb = p.detach().numpy()
+#         Wcb = tmp
 
 
 # A11 = (1-beta-gamma) * np.eye(5)
