@@ -36,22 +36,27 @@ class PCMLP(nn.Module):
         if linear:
             self.activation = lambda x: x
         self.transp = transp
-        self.complex = complex_valued
-
-        if complex_valued:
-            self.gammaFw = gammaFw * torch.ones(1).cuda()
-            self.alphaRec = alphaRec * torch.ones(1).cuda()
-            self.betaFB = betaFB * torch.ones(1).cuda()
-            self.memory = memory * torch.ones(1).cuda().to()
-            self.num_hidden = 196
-            self.fciA = ComplexLinear(self.num_hidden,self.num_hidden)
-            self.fcAi = ComplexLinear(self.num_hidden,self.num_hidden)
-            self.fcAB = ComplexLinear(self.num_hidden,self.num_hidden)
-            self.fcBA = ComplexLinear(self.num_hidden,self.num_hidden)
-            #self.fcBC = ComplexLinear(self.num_hidden,self.num_hidden)
-            #self.fcCB = ComplexLinear(self.num_hidden,self.num_hidden)
-            self.fcout = ComplexLinear(self.num_hidden,10)
+        self.complex_valued = complex_valued
+        self.MSE = nn.functional.mse_loss
+        
+        if self.complex_valued:
+    
+            # # self.fciA = ComplexLinear(self.num_hidden,self.num_hidden)
+            # # self.fcAi = ComplexLinear(self.num_hidden,self.num_hidden)
+            # # self.fcAB = ComplexLinear(self.num_hidden,self.num_hidden)
+            # # self.fcBA = ComplexLinear(self.num_hidden,self.num_hidden)
+            # # #self.fcBC = ComplexLinear(self.num_hidden,self.num_hidden)
+            # # #self.fcCB = ComplexLinear(self.num_hidden,self.num_hidden)
+            # self.fcout = ComplexLinear(self.num_hidden,10)
+            self.fciA = nn.Linear(self.num_hidden,self.num_hidden,dtype=torch.complex64)
+            self.fcAi = nn.Linear(self.num_hidden,self.num_hidden,dtype=torch.complex64)
+            self.fcAB = nn.Linear(self.num_hidden,self.num_hidden,dtype=torch.complex64)
+            self.fcBA = nn.Linear(self.num_hidden,self.num_hidden,dtype=torch.complex64)
+            #self.fcBC = nn.Linear(self.num_hidden,self.num_hidden)
+            #self.fcCB = nn.Linear(self.num_hidden,self.num_hidden)
+            self.fcout = nn.Linear(self.num_hidden,10,dtype=torch.complex64)
             self.activation = complex_relu
+            self.MSE = lambda x, y : torch.mean((x-y).abs()**2)
 
 
 
@@ -74,8 +79,8 @@ class PCMLP(nn.Module):
             bNew= self.activation(self.fcAB(aNew))
             oNew = self.fcout(bNew)
             if self.complex_valued:
-                oNewR, oNewI = oNew
-                Onew = torch.sqrt(torch.pow(oNewR,2)+torch.pow(oNewI,2))
+                oNewR, oNewI = oNew.real, oNew.imag
+                oNew = torch.sqrt(torch.pow(oNewR,2)+torch.pow(oNewI,2))
 
 
 
@@ -92,10 +97,10 @@ class PCMLP(nn.Module):
                 betaBw = torch.sigmoid(self.betaFB) / den
 
             if self.transp:
-                errorI = nn.functional.mse_loss(torch.matmul(a, self.fciA.weight), i)
+                errorI = self.MSE(torch.matmul(a, self.fciA.weight), i)
                 reconstructionI = torch.autograd.grad(errorI, a, retain_graph=True)[0]
 
-                errorA = nn.functional.mse_loss(torch.matmul(b, self.fcAB.weight), a)
+                errorA = self.MSE(torch.matmul(b, self.fcAB.weight), a)
                 reconstructionA = torch.autograd.grad(errorA, b, retain_graph=True)[0]
 
 
@@ -103,10 +108,10 @@ class PCMLP(nn.Module):
                 bNew = gammaFw * self.activation(self.fcAB(aNew)) + + (1 - gammaFw) * b - self.alphaRec * batchSize * reconstructionA
                 oNew = self.fcout(bNew)
             else:
-                errorI = nn.functional.mse_loss(self.fcAi(a), i)
+                errorI = self.MSE(self.fcAi(a), i)
                 reconstructionI = torch.autograd.grad(errorI, a, retain_graph=True)[0]
 
-                errorA = nn.functional.mse_loss(self.fcBA(b), a)
+                errorA = self.MSE(self.fcBA(b), a)
                 reconstructionA = torch.autograd.grad(errorA, b, retain_graph=True)[0]
 
 
@@ -115,8 +120,8 @@ class PCMLP(nn.Module):
                 oNew = self.fcout(bNew)
 
             if self.complex_valued:
-                oNewR, oNewI = oNew
-                Onew = torch.sqrt(torch.pow(oNewR,2)+torch.pow(oNewI,2))
+                oNewR, oNewI = oNew.real, oNew.imag
+                oNew = torch.sqrt(torch.pow(oNewR,2)+torch.pow(oNewI,2))
 
 
         out =  torch.log_softmax(oNew,dim=1)

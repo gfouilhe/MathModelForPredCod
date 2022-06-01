@@ -15,14 +15,14 @@ timeSteps = 50
 normA = []
 normB = []
 normO = []
-gamma_beta_couples = [(0.1,0.7),(0.25,0.5),(0.33,0.33),(0.5,0.25),(0.7,0.1)]
-alpha_range = [0.01,0.05,0.1,0.5]
+gamma_beta_couples = [(0.6,0.2)]#(0.1,0.7),(0.25,0.5),(0.33,0.33),(0.5,0.25),(0.7,0.1)]
+alpha_range = [0.01]#,0.05,0.1,0.5]
 for gamma, beta in gamma_beta_couples:
     normA = []
     normB = []
     normO = []
     for alpha in alpha_range:
-        with open(os.path.join('oscillations_parameters_setup',f'params_dictionary_G{gamma}_B{beta}_A{alpha}.pkl'), 'rb') as f:
+        with open(os.path.join('oscillations_parameters_setup',f'ACparams_dictionary_{alpha}.pkl'), 'rb') as f:
             params_and_imgs = pickle.load(f)
 
         params_list = [param for _,param in params_and_imgs.items()]
@@ -32,10 +32,10 @@ for gamma, beta in gamma_beta_couples:
         actO = np.zeros((len(params_list),timeSteps+1,10))
         for i,im in enumerate(params_list):
             betab,gammab,img = im
-            pcmodel = PCMLP(0.33,alpha,betaFB=betab,gammaFw=gammab).to(device)
-            checkpointPhase = torch.load(os.path.join('models',f"PC_E19_I0_G{gamma}_B{beta}_A{alpha}.pth"))
+            pcmodel = PCMLP(0.33,alpha,betaFB=betab,gammaFw=gammab,complex_valued=True).to(device)
+            checkpointPhase = torch.load(os.path.join('models',f"APCC_E19_I0_G0.6_B0.2_A{alpha}.pth"))
             pcmodel.load_state_dict(checkpointPhase["module"])
-            img = torch.from_numpy(img.astype('float32')).to(device)
+            img = torch.from_numpy(img).to(dtype=torch.complex64).to(device)
             aTemp = torch.zeros(batchSize, 196).cuda()
             bTemp = torch.zeros(batchSize, 196).cuda()
             oTemp = torch.zeros(batchSize, 10).cuda()
@@ -58,13 +58,12 @@ for gamma, beta in gamma_beta_couples:
 
 
     for j,alpha in enumerate(alpha_range):
-        with open(os.path.join('oscillations_parameters_setup',f'params_dictionary_G{gamma}_B{beta}_A{alpha}.pkl'), 'rb') as f:
+        with open(os.path.join('oscillations_parameters_setup',f'ACparams_dictionary_{alpha}.pkl'), 'rb') as f:
             params_and_imgs = pickle.load(f)
         params_list = [param for _,param in params_and_imgs.items()]
         for i, _ in enumerate(params_list):
 
             nA = normA[j]
-            print(nA)
             nB = normB[j]
             nO = normO[j]
 
@@ -72,7 +71,7 @@ for gamma, beta in gamma_beta_couples:
                 print('yoaozeazeazea')
                 pass
             else:
-                print('hi')
+                
                 plt.figure(figsize=(15,5))
                 plt.subplot(1,3,1)
                 plt.plot(nA[i])
@@ -80,7 +79,7 @@ for gamma, beta in gamma_beta_couples:
                 plt.plot(nB[i])
                 plt.subplot(1,3,3)
                 plt.plot(nO[i])
-                plt.savefig(os.path.join('oscillations_attempt_plot_norm',f'actplot_G{gamma}_B{beta}_A{alpha}_{i}.png'))
+                plt.savefig(os.path.join('oscillations_attempt_plot_norm',f'ACactplot_G{gamma}_B{beta}_A{alpha}_{i}.png'))
                 plt.close()
 
 

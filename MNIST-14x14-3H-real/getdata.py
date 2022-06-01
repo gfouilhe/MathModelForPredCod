@@ -6,9 +6,11 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import os
 
+trans = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (1.0,)),transforms.Resize((14,14))])
+
 def get_data():
-    train = datasets.MNIST(os.path.join('data'),train=True,download=False,transform=transforms.Compose([transforms.Resize((14,14)),transforms.ToTensor()]))
-    test = datasets.MNIST(os.path.join('data'),train=False,download=False,transform=transforms.Compose([transforms.Resize((14,14)),transforms.ToTensor()]))
+    train = datasets.MNIST(os.path.join('data'),train=True,download=False,transform=trans)
+    test = datasets.MNIST(os.path.join('data'),train=False,download=False,transform=trans)
     return train,test
 
 # train,test = get_data()

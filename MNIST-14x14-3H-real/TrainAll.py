@@ -19,7 +19,7 @@ alphaRec = 0.01
 betaFB = 0.2
 
 
-iterationNumber = 5
+iterationNumber = 1
 numberEpochs = 20
 timeSteps = 30
 
@@ -49,7 +49,7 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,timeSteps):
 
     for iterationIndex in range(0, iterationNumber):
 
-        pcNet = PCMLP(memory,alphaRec,betaFB,gammaFw).to(device)
+        pcNet = PCMLP(memory,alphaRec,betaFB,gammaFw,complex_valued=True).to(device)
 
 
         criterion = nn.CrossEntropyLoss()
@@ -63,13 +63,13 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,timeSteps):
             #train
             for i, data in enumerate(train_loader, 0):
 
-                aTemp = torch.zeros(batchSize, 196).cuda()
-                bTemp = torch.zeros(batchSize, 196).cuda()
-                oTemp = torch.zeros(batchSize, 10).cuda()
+                aTemp = torch.zeros(batchSize, 196).to(dtype=torch.complex64).cuda()
+                bTemp = torch.zeros(batchSize, 196).to(dtype=torch.complex64).cuda()
+                oTemp = torch.zeros(batchSize, 10).to(dtype=torch.complex64).cuda()
 
 
                 inputs, labels = data
-                inputs, labels = inputs.to(device),labels.to(device)
+                inputs, labels = inputs.to(dtype=torch.complex64).to(device),labels.to(device)
 
                 optimizerPCnet.zero_grad()
                 finalLoss = 0
@@ -88,7 +88,7 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,timeSteps):
                 finalLoss.backward(retain_graph=True)  
                 optimizerPCnet.step()
 
-            path = os.path.join('models',f"PC_E{epoch}_I{iterationIndex}_G{gammaFw}_B{betaFB}_A{alphaRec}.pth")
+            path = os.path.join('models',f"APCC_E{epoch}_I{iterationIndex}_G{gammaFw}_B{betaFB}_A{alphaRec}.pth")
             torch.save({"module": pcNet.state_dict(), "epoch": epoch}, path)
 
             #compute test accuracy
@@ -96,9 +96,9 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,timeSteps):
             total = 0
             for _, data in enumerate(test_loader, 0):
 
-                aTemp = torch.zeros(batchSize, 196).cuda()
-                bTemp = torch.zeros(batchSize, 196).cuda()
-                oTemp = torch.zeros(batchSize, 10).cuda()
+                aTemp = torch.zeros(batchSize, 196).to(dtype=torch.complex64).cuda()
+                bTemp = torch.zeros(batchSize, 196).to(dtype=torch.complex64).cuda()
+                oTemp = torch.zeros(batchSize, 10).to(dtype=torch.complex64).cuda()
 
                 aTemp.requires_grad = True
                 bTemp.requires_grad = True
@@ -106,7 +106,7 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,timeSteps):
 
                 # get the inputs; data is a list of [inputs, labels]
                 inputs, labels = data
-                inputs, labels = inputs.to(device),labels.to(device)
+                inputs, labels = inputs.to(dtype=torch.complex64).to(device),labels.to(device)
 
                 outputs, iTemp, aTemp, bTemp, oTemp, reconstruction = pcNet(inputs.view(batchSize,-1), aTemp, bTemp, oTemp, 'forward')
                 for tt in range(timeSteps):
@@ -119,7 +119,7 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,timeSteps):
 
             resAll[:, epoch, iterationIndex] = (100 * correct / total)
 
-    np.save(os.path.join('accuracies',f"accTrainingCE__G{gammaFw}_B{betaFB}_A{alphaRec}.npy"), resAll)
+    np.save(os.path.join('accuracies',f"ACaccTrainingCE__G{gammaFw}_B{betaFB}_A{alphaRec}.npy"), resAll)
     print('Finished Training')
 
 

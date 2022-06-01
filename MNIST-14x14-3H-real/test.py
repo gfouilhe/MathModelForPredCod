@@ -1,85 +1,66 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import numpy as np
-from getdata import get_data
-import os
+from torchvision import datasets, transforms
+from complexPyTorch.complexLayers import ComplexBatchNorm2d, ComplexConv2d, ComplexLinear
+from complexPyTorch.complexFunctions import complex_relu, complex_max_pool2d
 
-class mlp(nn.Module):
-    def __init__(self, memory ,transp=False):
-        
-        super(mlp,self).__init__()
+batch_size = 64
+trans = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (1.0,))])
+train_set = datasets.MNIST('../data', train=True, transform=trans, download=False)
+test_set = datasets.MNIST('../data', train=False, transform=trans, download=False)
 
-        self.num_hidden = 196
-        self.fciA = nn.Linear(self.num_hidden,self.num_hidden)
-        self.fcAi = nn.Linear(self.num_hidden,self.num_hidden)
-        self.fcAB = nn.Linear(self.num_hidden,self.num_hidden)
-        self.fcBA = nn.Linear(self.num_hidden,self.num_hidden)
-        self.fcout = nn.Linear(self.num_hidden,10)
-        self.activation = F.relu
-        self.transp = transp
+train_loader = torch.utils.data.DataLoader(train_set, batch_size= batch_size, shuffle=True)
+test_loader = torch.utils.data.DataLoader(test_set, batch_size= batch_size, shuffle=True)
 
+class ComplexNet(nn.Module):
+    
+    def __init__(self):
+        super(ComplexNet, self).__init__()
+        self.conv1 = ComplexConv2d(1, 10, 5, 1)
+        self.bn  = ComplexBatchNorm2d(10)
+        self.conv2 = ComplexConv2d(10, 20, 5, 1)
+        self.fc1 = ComplexLinear(4*4*20, 500)
+        self.fc2 = ComplexLinear(500, 10)
+             
+    def forward(self,x):
+        x = self.conv1(x)
+        x = complex_relu(x)
+        x = complex_max_pool2d(x, 2, 2)
+        x = self.bn(x)
+        x = self.conv2(x)
+        x = complex_relu(x)
+        x = complex_max_pool2d(x, 2, 2)
+        x = x.view(-1,4*4*20)
+        x = self.fc1(x)
+        x = complex_relu(x)
+        x = self.fc2(x)
+        x = x.abs()
+        x =  F.log_softmax(x, dim=1)
+        return x
+    
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model = ComplexNet().to(device)
+optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
 
-    def forward(self, i, a, b, o, networkMode):
+def train(model, device, train_loader, optimizer, epoch):
+    model.train()
+    for batch_idx, (data, target) in enumerate(train_loader):
+        data, target = data.to(device).type(torch.complex64), target.to(device)
+        optimizer.zero_grad()
+        output = model(data)
+        loss = F.nll_loss(output, target)
+        loss.backward()
+        optimizer.step()
+        if batch_idx % 100 == 0:
+            print('Train Epoch: {:3} [{:6}/{:6} ({:3.0f}%)]\tLoss: {:.6f}'.format(
+                epoch,
+                batch_idx * len(data), 
+                len(train_loader.dataset),
+                100. * batch_idx / len(train_loader), 
+                loss.item())
+            )
 
-        errorI=[]
-        reconstructionI = []
-
-        errorA = []
-        reconstructionA = []
-
-        batchSize = a.shape[0]
-
-
-        assert networkMode in ['forward','full']
-
-        if networkMode == 'forward':
-
-            aNew = self.activation(self.fciA(i))
-            bNew= self.activation(self.fcAB(aNew))
-            oNew = self.fcout(bNew)
-
-
-        elif networkMode == 'full':
-
-            if self.betaFB ==0:
-                den = torch.sigmoid(self.gammaFw) + torch.sigmoid(self.memory)
-                gammaFw = torch.sigmoid(self.gammaFw) / den
-                betaBw = 0
-            else:
-                den = torch.sigmoid(self.gammaFw) + torch.sigmoid(self.betaFB) + torch.sigmoid(self.memory)
-                gammaFw = torch.sigmoid(self.gammaFw) / den
-                betaBw = torch.sigmoid(self.betaFB) / den
-
-            if self.transp:
-                errorI = nn.functional.mse_loss(torch.matmul(a, self.fciA.weight), i)
-                reconstructionI = torch.autograd.grad(errorI, a, retain_graph=True)[0]
-
-                errorA = nn.functional.mse_loss(torch.matmul(b, self.fcAB.weight), a)
-                reconstructionA = torch.autograd.grad(errorA, b, retain_graph=True)[0]
-
-
-                aNew = gammaFw * self.activation(self.fciA(i)) + (1 - gammaFw - betaBw) * a + betaBw * self.activation(torch.matmul(b, self.fcAB.weight)) - self.alphaRec * batchSize * reconstructionI
-                bNew = gammaFw * self.activation(self.fcAB(aNew)) + + (1 - gammaFw) * b - self.alphaRec * batchSize * reconstructionA
-                oNew = self.fcout(bNew)
-            else:
-                errorI = nn.functional.mse_loss(self.fcAi(a), i)
-                reconstructionI = torch.autograd.grad(errorI, a, retain_graph=True)[0]
-
-                errorA = nn.functional.mse_loss(self.fcBA(b), a)
-                reconstructionA = torch.autograd.grad(errorA, b, retain_graph=True)[0]
-
-
-                aNew = gammaFw * self.activation(self.fciA(i)) + (1 - gammaFw - betaBw) * a + betaBw * self.activation(self.fcBA(b)) - self.alphaRec * batchSize * reconstructionI
-                bNew = gammaFw * self.activation(self.fcAB(aNew)) + + (1 - gammaFw) * b - self.alphaRec * batchSize * reconstructionA
-                oNew = self.fcout(bNew)
-
-        out =  torch.log_softmax(oNew,dim=1)
-        return out, i, aNew, bNew,  oNew, reconstructionA
-
-
-model1 = mlp(0.33,True)
-
-
-path = os.path.join('models','PCT_E19_I0_G0.6_B0.2_A0.01.pth')
-model.load_state_dict(torch.load(path)["module"])
+# Run training on 50 epochs
+for epoch in range(50):
+    train(model, device, train_loader, optimizer, epoch)

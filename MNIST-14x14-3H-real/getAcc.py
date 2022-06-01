@@ -14,7 +14,7 @@ def getMean(acc,mode='ff'):
         mean[t] = np.mean(acc[t,-1,:])
     return mean
 
-path = os.path.join('accuracies','accTrainingCE.npy')
+path = os.path.join('accuracies','ACaccTrainingCE__G0.6_B0.2_A0.01.npy')
 acc = np.load(path)
 
 
