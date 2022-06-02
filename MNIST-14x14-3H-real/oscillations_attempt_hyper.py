@@ -68,7 +68,7 @@ for gamma, beta in gamma_beta_couples:
             nO = normO[j]
 
             if np.size(normA[j])==0:
-                print('yoaozeazeazea')
+                print('No imgs')
                 pass
             else:
                 
