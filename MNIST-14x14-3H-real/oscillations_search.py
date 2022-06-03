@@ -26,8 +26,8 @@ for alpha in [0.01]: #,0.05,0.1,0.25]:
 
     threshold = []
 
-    model= PCMLP(0.33,alpha,0.6,0.2,complex_valued=True)
-    checkpointPhase = torch.load(os.path.join('models',f"PCC_E19_I0_G0.6_B0.2_A0.01.pth"))
+    model= PCMLP(0.33,alpha,0.7,0.1)
+    checkpointPhase = torch.load(os.path.join('models',f"PC_E19_I0_G0.7_B0.1_A0.01.pth"))
     model.load_state_dict(checkpointPhase["module"])
     for name, p in model.named_parameters():
         tmp = p.detach().numpy()
