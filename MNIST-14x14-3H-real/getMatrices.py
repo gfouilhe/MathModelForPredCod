@@ -9,53 +9,71 @@ os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
 
 alpha = 0.01
-beta = 0.5
-gamma = 0.2
+beta = 0.2
+gamma = 0.6
 mem = 0.33
 model= PCMLP(0.33,alpha,beta,gamma,complex_valued=True)
-checkpointPhase = torch.load(os.path.join('models',f"APCC_E19_I0_G0.6_B0.2_A0.01.pth"))
+checkpointPhase = torch.load(os.path.join('models',f"PCC_E19_I0_G0.6_B0.2_A0.01.pth"))
 model.load_state_dict(checkpointPhase["module"])
 for name, p in model.named_parameters():
     print(name)
-    # if name=='fciA.fc_r.weight':
-    #     print(p.detach().numpy().shape)
-    # if name=='fciA.fc_i.weight':
-    #     print(p.detach().numpy().shape)
     
     tmp = p.detach().numpy()
-    if name=='fcAB.weight':
-        W12 = tmp
-    if name=='fcBA.weight':
-        W21 = tmp
-    if name=='fciA.weight':
-        W01 = tmp
-    if name=='fcAi.weight':
-        W10 = tmp
 
+    if name=='fciA.fc_r.weight':
+        W01R = tmp
+    if name=='fciA.fc_i.weight':
+        W01I = tmp
+    if name=='fcAB.fc_r.weight':
+        W12R = tmp
+    if name=='fcAB.fc_i.weight':
+        W12I = tmp
+    if name=='fcAi.fc_r.weight':
+        W10R = tmp
+    if name=='fcAi.fc_i.weight':
+        W10I = tmp
+    if name=='fcBA.fc_r.weight':
+        W21R = tmp
+    if name=='fcBA.fc_i.weight':
+        W21I = tmp
+    
+    # if name=='fcAB.weight':
+    #     W12 = tmp
+    # if name=='fcBA.weight':
+    #     W21 = tmp
+    # if name=='fciA.weight':
+    #     W01 = tmp
+    # if name=='fcAi.weight':
+    #     W10 = tmp
 
-d = W12.shape[1]
+d = W01R.shape[1]
 Z = np.zeros((d,d))
-Wf = np.block([[Z,Z],[W12,Z]])
-Wb = np.block([[Z,W21],[Z,Z]])
-IdJ = np.eye(2*d)
-Id = np.eye(d)
+W01 = np.block([[W01R,Z],[Z,W01I]])
+W10 = np.block([[W10R,Z],[Z,W10I]])
+W12 = np.block([[W12R,Z],[Z,W12I]])
+W21 = np.block([[W21R,Z],[Z,W21I]])
 
-M1 = np.linalg.inv((IdJ-gamma*Wf))
+# Z = np.zeros((2*d,2*d))
+# Wf = np.block([[Z,Z],[W12,Z]])
+# Wb = np.block([[Z,W21],[Z,Z]])
+# IdJ = np.eye(2*d)
+# Id = np.eye(d)
 
-D = np.block([[(1-beta-gamma)*Id,Z],[Z,(1-gamma)*Id]])
-E = np.block([[-W10.T.dot(W10),Z],[W21.T,-W21.T.dot(W21)]])
-M2 = beta*Wb + D + alpha/d * E
+# M1 = np.linalg.inv((IdJ-gamma*Wf))
 
-A = M1.dot(M2)
+# D = np.block([[(1-beta-gamma)*Id,Z],[Z,(1-gamma)*Id]])
+# E = np.block([[-W10.T.dot(W10),Z],[W21.T,-W21.T.dot(W21)]])
+# M2 = beta*Wb + D + alpha/d * E
 
-A11 = (1-beta-gamma) * np.eye(d)
+# A = M1.dot(M2)
+
+A11 = (1-beta-gamma) * np.eye(2*d)
 A12 = beta * W21
 A21 = (1-beta-gamma) * gamma * W12 + alpha/d * W21.T
-A22 = gamma * beta * W12.dot(W21) + (1-gamma) * np.eye(d) - alpha/d * W21.T.dot(W21)
+A22 = gamma * beta * W12.dot(W21) + (1-gamma) * np.eye(2*d) - alpha/(2*d) * W21.T.dot(W21)
 
-A_hand = np.block([[A11,A12],[A21,A22]])
+A = np.block([[A11,A12],[A21,A22]])
 
-print(np.max(A-A_hand))
 
 w, v = np.linalg.eig(A)
 ax = plt.gca()
@@ -64,6 +82,7 @@ ax.cla()
 circle = plt.Circle((0,0),1,color='r',fill=False)
 ax.add_patch(circle)
 for eig in w:
+    print(eig)
     re = np.real(eig)
     im = np.imag(eig)
     ax.plot(re,im,'o',color='blue')
