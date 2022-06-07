@@ -72,39 +72,11 @@ def main():
                     actA[i,t+1,:] = aTemp.detach().cpu().numpy()
                     actB[i,t+1,:] = bTemp.detach().cpu().numpy()
                     actO[i,t+1,:] = oTemp.detach().cpu().numpy()
-            normA.append(np.linalg.norm(actA,axis=2))
-            normB.append(np.linalg.norm(actB,axis=2))
-            normO.append(np.linalg.norm(actO,axis=2))
+            normA = np.linalg.norm(actA,axis=2)
+            normB = np.linalg.norm(actB,axis=2)
+            normO = np.linalg.norm(actO,axis=2)
 
-        # actA = np.linalg.norm(actA,axis=2)
-        # actB = np.linalg.norm(actB,axis=2)
-        # actO = np.linalg.norm(actO,axis=2)
-
-
-    for j, (gammaFw,betaFB,alphaRec) in enumerate(UsedForLearningHyper):
-
-        for alpha in alphaR:
-
-            if mode=='oscillations':
-
-                path = os.path.join('parameters_setup',f'{comment}_good_params_dictionary_G{gammaFw}_B{betaFB}_A{alphaRec}_{alpha}.pkl')
-
-            if mode=='explode':
-
-                path = os.path.join('parameters_setup',f'{comment}_over_params_dictionary_G{gammaFw}_B{betaFB}_A{alphaRec}_{alpha}.pkl')
-                
-            if mode=='dump':
-                
-                path = os.path.join('parameters_setup',f'{comment}_under_params_dictionary_G{gammaFw}_B{betaFB}_A{alphaRec}_{alpha}.pkl')
-    
-            with open(path, 'rb') as f:
-                params_and_imgs = pickle.load(f)
-            params_list = [param for _,param in params_and_imgs.items()]
-            for i, _ in enumerate(params_list):
-
-                nA = normA[j]
-                nB = normB[j]
-                nO = normO[j]
+            for i, (gamma,beta,_) in enumerate(params_list):
 
                 if np.size(normA[j])==0:
                     pass
@@ -119,7 +91,7 @@ def main():
                     plt.subplot(1,3,3)
                     plt.plot(nO[i])
                     plt.title('Layer O')
-                    plt.savefig(os.path.join(f'{mode}_attempt_plot_norm',f'actplot_G{gamma}_B{beta}_A{alpha}_{i}.png'))
+                    plt.savefig(os.path.join(f'{mode}_attempt_plot_norm',f'actplot_G{gammaFw}_B{betaFB}_A{alphaRec}_G{gamma}_B{beta}_A{alpha}_{i}.png'))
                     plt.close()
 
 if __name__ == "__main__":
