@@ -29,9 +29,6 @@ def main():
     #
 
     # Parameters used for learning :
-    gammaFwL = [0.7]
-    alphaRecL = [0.01]
-    betaFBL = [0.1]
     UsedForLearningHyper = [(0.7,0.1,0.01),(0.33,0.33,0.01),(0.85,0.05,0.01),(0.95,0.01,0.01)]
     #
 
@@ -135,7 +132,7 @@ def main():
                 print('Saving plots...')
                 plt.figure()
                 plt.scatter(*zip(*over_one),color='blue',label=f'$\\rho$ > {1+tolOver}',s=0.1)
-                plt.scatter(*zip(*under_one),color='green',label=f'$\\rho$< {1-tolOver}',s=0.1)
+                plt.scatter(*zip(*under_one),color='green',label=f'$\\rho$< {1-tolUnder}',s=0.1)
                 plt.scatter(*zip(*good_params),color='red',label='$\\rho$ = 1',s=0.5)
                 plt.scatter(betaFB,gammaFw, label='Used during learning')
                 x = np.linspace(0,1,100)
