@@ -26,10 +26,6 @@ def main():
     timeSteps = 10
 
 
-    normA = []
-    normB = []
-    normO = [] 
-
     for gammaFw, betaFB, alphaRec in UsedForLearningHyper:
 
         for alpha in alphaR:
@@ -78,18 +74,18 @@ def main():
 
             for i, (gamma,beta,_) in enumerate(params_list):
 
-                if np.size(normA[j])==0:
+                if np.size(normA[i])==0:
                     pass
                 else:
                     plt.figure(figsize=(15,5))
                     plt.subplot(1,3,1)
-                    plt.plot(nA[i])
+                    plt.plot(normA[i])
                     plt.title('Layer A')
                     plt.subplot(1,3,2)
-                    plt.plot(nB[i])
+                    plt.plot(normB[i])
                     plt.title('Layer B')
                     plt.subplot(1,3,3)
-                    plt.plot(nO[i])
+                    plt.plot(normO[i])
                     plt.title('Layer O')
                     plt.savefig(os.path.join(f'{mode}_attempt_plot_norm',f'actplot_G{gammaFw}_B{betaFB}_A{alphaRec}_G{gamma}_B{beta}_A{alpha}_{i}.png'))
                     plt.close()
