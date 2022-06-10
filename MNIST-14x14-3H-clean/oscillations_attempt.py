@@ -28,10 +28,8 @@ def main():
     
     if commentact == 'linear' :
         activation = lambda x:x 
-        print('yo')
     elif commentact == 'tanh':
         activation = torch.tanh
-        print('hi')
     elif commentact == 'relu':
         activation = torch.relu
 
