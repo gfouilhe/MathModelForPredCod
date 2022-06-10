@@ -21,20 +21,19 @@ betaFB = 0.2
 
 iterationNumber = 1
 numberEpochs = 20
-timeSteps = 30
 activation_function = F.tanh
 transpose = False
 complex_valued = False
 checkpoint = [f"FF_E{numberEpochs-1}_I{it}_G{gammaFw}_B{betaFB}_A{alphaRec}.pth" for it in range(iterationNumber)]
 
 
-def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,timeSteps, activation_function, transpose, complex_valued, checkpoint):
+def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs, activation_function, transpose, complex_valued, checkpoint):
 
     assert checkpoint != 0, 'Reconstuction should be used with a checkpoint from FF learned weights'
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(device)
-    print('Parameters :',gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,timeSteps,activation_function, transpose, complex_valued)
+    print('Parameters :',gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,activation_function, transpose, complex_valued)
         
     batchSize = 100
 
@@ -51,7 +50,8 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,timeSteps, activat
 
     memory = 0.33
 
-    resAll = np.empty((timeSteps,numberEpochs, iterationNumber))
+    resRecLoss = np.empty((3, numberEpochs, iterationNumber))
+    resAll = np.empty((numberEpochs, iterationNumber))
 
     for iterationIndex in range(0, iterationNumber):
 
@@ -94,7 +94,7 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,timeSteps, activat
                 oTemp.requires_grad = True
 
                 outputs, iTemp, aTemp, bTemp, oTemp, reconstruction = pcNet(inputs.view(batchSize,-1), aTemp, bTemp, oTemp, 'forward')
-                outputs, iR, aR, bR, oR, reconstruction = pcNet(inputs.view(batchSize,-1), aTemp, bTemp, oTemp, 'full')
+                outputs, iR, aR, bR, oR, reconstruction = pcNet(inputs.view(batchSize,-1), aTemp, bTemp, oTemp, 'reconstruction')
 
                 lossA = criterionMSE(inputs.view(batchSize,-1), iR)
                 lossB = criterionMSE(aTemp.view(batchSize,-1), aR)
@@ -109,9 +109,11 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,timeSteps, activat
                 path = os.path.join('models',f"FFREC_E{epoch}_I{iterationIndex}_G{gammaFw}_B{betaFB}_A{alphaRec}.pth")
                 torch.save({"module": pcNet.state_dict(), "epoch": epoch}, path)
 
-            #compute test accuracy
-            correct = np.zeros(timeSteps)
+            #compute test Loss/Acc
+            correct = 0
             total = 0
+            finalLossA = 0
+            finalLossB = 0
             for _, data in enumerate(test_loader, 0):
 
                 if complex_valued:
@@ -135,21 +137,29 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,timeSteps, activat
                     inputs, labels = inputs.to(dtype=torch.float32).to(device),labels.to(device)
 
                 outputs, iTemp, aTemp, bTemp, oTemp, reconstruction = pcNet(inputs.view(batchSize,-1), aTemp, bTemp, oTemp, 'forward')
-                for tt in range(timeSteps):
-                    outputs, iTemp, aTemp, bTemp, oTemp, reconstruction = pcNet(inputs.view(batchSize,-1), aTemp, bTemp, oTemp, 'full')
+                outputs, iR, aR, bR, oR, reconstruction = pcNet(inputs.view(batchSize,-1), aTemp, bTemp, oTemp, 'reconstruction')
 
-                    _, predicted = torch.max(outputs.data, 1)
-                    correct[tt] = correct[tt] + (predicted == labels).sum().item()
+                finalLossA += criterionMSE(inputs.view(batchSize,-1), iR)
+                finalLossB += criterionMSE(aTemp.view(batchSize,-1), aR)
 
                 total += labels.size(0)
 
-            resAll[:, epoch, iterationIndex] = (100 * correct / total)
+                _, predicted = torch.max(outputs.data, 1)
+                correct = correct + (predicted == labels).sum().item()
 
+                total += labels.size(0)
+
+            resAll[epoch, iterationIndex] = (100 * correct / total)
+            resRecLoss[0, epoch, iterationIndex] = finalLossA / total
+            resRecLoss[1, epoch, iterationIndex] = finalLossB / total
+
+
+    np.save(os.path.join('accuracies',f'REC__G{gammaFw}_B{betaFB}_A{alphaRec}.npy'),resRecLoss)
     np.save(os.path.join('accuracies',f"ALL__G{gammaFw}_B{betaFB}_A{alphaRec}.npy"), resAll)
     print('Finished Training')
 
 
 if __name__ == "__main__":
-    main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,timeSteps,activation_function, transpose, complex_valued, checkpoint)
+    main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,activation_function, transpose, complex_valued, checkpoint)
 
 

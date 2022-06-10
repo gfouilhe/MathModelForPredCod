@@ -39,11 +39,11 @@ def main():
 
     # Others :
     numberEpochs = 20
-    plot = True
+    plot = False
     eigen_compute = True
     oscill_compute = True
-    div_compute = True
-    dump_compute = True
+    div_compute = False
+    dump_compute = False
     save_imgs = False
     comment = ''
 
@@ -168,6 +168,7 @@ def main():
                         else:
                             #print(eig)
                             osci_eigv.append((beta,gamma,v[i]))
+                            print(eig, abs(eig))
 
                 osci_imgs = [(beta,gamma,np.real(y[:196])) for beta,gamma,y in osci_eigv]
 

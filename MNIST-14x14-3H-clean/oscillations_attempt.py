@@ -16,15 +16,24 @@ def main():
 
     #------ Parameteters -------
 
-    mode = 'explode' # 'explode' , 'dump'
+    mode = 'dump' # 'explode' , 'dump', 'oscillations'
 
 
     UsedForLearningHyper = [(0.7,0.1,0.01),(0.33,0.33,0.01),(0.85,0.05,0.01),(0.95,0.01,0.01)]
     comment = ''
     alphaR = [0.01,0.05,0.1,0.25]
     numberEpochs = 20
-    timeSteps = 10
-
+    timeSteps = 50
+    commentact = 'linear' #'tanh' ; 'relu'
+    
+    if commentact == 'linear' :
+        activation = lambda x:x 
+        print('yo')
+    elif commentact == 'tanh':
+        activation = torch.tanh
+        print('hi')
+    elif commentact == 'relu':
+        activation = torch.relu
 
     for gammaFw, betaFB, alphaRec in UsedForLearningHyper:
 
@@ -52,7 +61,7 @@ def main():
             actO = np.zeros((len(params_list),timeSteps+1,10))
             for i,im in enumerate(params_list):
                 beta,gamma,img = im
-                pcmodel = PCMLP(0.33,alphaRec=alpha,betaFB=beta,gammaFw=gamma,activation_function=torch.tanh).to(device)
+                pcmodel = PCMLP(0.33,alphaRec=alpha,betaFB=beta,gammaFw=gamma,activation_function=activation).to(device)
                 checkpointPhase = torch.load(os.path.join('models',f"FFREC_E{numberEpochs-1}_I0_G{gammaFw}_B{betaFB}_A{alphaRec}.pth"))
                 pcmodel.load_state_dict(checkpointPhase["module"])
                 img = torch.from_numpy(img.astype('float32')).to(device)
@@ -87,7 +96,7 @@ def main():
                     plt.subplot(1,3,3)
                     plt.plot(normO[i])
                     plt.title('Layer O')
-                    plt.savefig(os.path.join(f'{mode}_attempt_plot_norm',f'actplot_G{gammaFw}_B{betaFB}_A{alphaRec}_G{gamma}_B{beta}_A{alpha}_{i}.png'))
+                    plt.savefig(os.path.join(f'{mode}_attempt_plot_norm',f'{commentact}actplot_G{gammaFw}_B{betaFB}_A{alphaRec}_G{gamma}_B{beta}_A{alpha}_{i}.png'))
                     plt.close()
 
 if __name__ == "__main__":

@@ -83,7 +83,8 @@ class PCMLP(nn.Module):
         elif networkMode == 'reconstruction':
 
                 i = self.fcAi(a)
-                bNew = self.fcBA(b)
+                aNew = self.fcBA(b)
+                bNew = b
                 oNew = o
 
         elif networkMode == 'full':
