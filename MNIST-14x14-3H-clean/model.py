@@ -78,7 +78,7 @@ class PCMLP(nn.Module):
             oNew = self.fcout(bNew)
             if self.complex_valued:
                 oNewR, oNewI = oNew.real, oNew.imag
-                oNew = torch.sqrt(torch.pow(oNewR,2)+torch.pow(oNewI,2))
+                oNew = torch.sqrt(torch.pow(oNewR,2)+torch.pow(oNewI,2)) #module
 
         elif networkMode == 'reconstruction':
 
@@ -89,15 +89,17 @@ class PCMLP(nn.Module):
 
         elif networkMode == 'full':
 
-            if self.betaFB ==0:
-                den = torch.sigmoid(self.gammaFw) + torch.sigmoid(self.memory)
-                gammaFw = torch.sigmoid(self.gammaFw) / den
-                betaBw = 0
-            else:
-                den = torch.sigmoid(self.gammaFw) + torch.sigmoid(self.betaFB) + torch.sigmoid(self.memory)
-                gammaFw = torch.sigmoid(self.gammaFw) / den
-                betaBw = torch.sigmoid(self.betaFB) / den
-
+            # if self.betaFB ==0:
+            #     den = torch.sigmoid(self.gammaFw) + torch.sigmoid(self.memory)
+            #     gammaFw = torch.sigmoid(self.gammaFw) / den
+            #     betaBw = 0
+            # else:
+            #     den = torch.sigmoid(self.gammaFw) + torch.sigmoid(self.betaFB) + torch.sigmoid(self.memory)
+            #     gammaFw = torch.sigmoid(self.gammaFw) / den
+            #     betaBw = torch.sigmoid(self.betaFB) / den
+            gammaFw = self.gammaFw
+            betaBw = self.betaFB
+            
             if self.transp:
                 errorI = self.MSE(torch.matmul(a, self.fciA.weight), i)
                 reconstructionI = torch.autograd.grad(errorI, a, retain_graph=True)[0]

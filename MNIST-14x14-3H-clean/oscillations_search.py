@@ -39,11 +39,11 @@ def main():
 
     # Others :
     numberEpochs = 20
-    plot = False
+    plot = True
     eigen_compute = True
     oscill_compute = True
-    div_compute = False
-    dump_compute = False
+    div_compute = True
+    dump_compute = True
     save_imgs = False
     comment = ''
 
