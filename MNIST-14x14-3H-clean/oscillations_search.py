@@ -170,9 +170,9 @@ def main():
                             osci_eigv.append((beta,gamma,v[i]))
                             print(eig, abs(eig))
 
-                osci_imgs = [(beta,gamma,np.real(y[:196])) for beta,gamma,y in osci_eigv]
+                osci_imgs = [(beta,gamma,np.real(y)) for beta,gamma,y in osci_eigv]#[(beta,gamma,np.real(y[:196])) for beta,gamma,y in osci_eigv]
 
-                unflattened_imgs = dict([(f"im{i})",(img[0],img[1],img[2].reshape((14,14)))) for i, img in enumerate(osci_imgs)]) #img[0:1] are parameters beta and gamma
+                unflattened_imgs =dict([(f"im{i})",(img[0],img[1],img[2])) for i, img in enumerate(osci_imgs)]) #dict([(f"im{i})",(img[0],img[1],img[2].reshape((14,14)))) for i, img in enumerate(osci_imgs)]) #img[0:1] are parameters beta and gamma
                 with open(os.path.join('parameters_setup',f'{comment}_good_params_dictionary_G{gammaFw}_B{betaFB}_A{alphaRec}_{alpha}.pkl'), 'wb') as f:
                     pickle.dump(unflattened_imgs, f)
             if div_compute:
@@ -196,9 +196,9 @@ def main():
                             #print(eig)
                             div_eigv.append((beta,gamma,v[i]))
 
-                div_imgs = [(beta,gamma,np.real(y[:196])) for beta,gamma,y in div_eigv]
+                div_imgs = [(beta,gamma,np.real(y)) for beta,gamma,y in div_eigv]
 
-                unflattened_imgs = dict([(f"im{i})",(img[0],img[1],img[2].reshape((14,14)))) for i, img in enumerate(div_imgs)]) #img[0:1] are parameters beta and gamma
+                unflattened_imgs = dict([(f"im{i})",(img[0],img[1],img[2])) for i, img in enumerate(div_imgs)]) #img[0:1] are parameters beta and gamma
                 with open(os.path.join('parameters_setup',f'{comment}_over_params_dictionary_G{gammaFw}_B{betaFB}_A{alphaRec}_{alpha}.pkl'), 'wb') as f:
                     pickle.dump(unflattened_imgs, f)
             if dump_compute:
@@ -222,9 +222,9 @@ def main():
                             #print(eig)
                             conv_eigv.append((beta,gamma,v[i]))
 
-                conv_imgs = [(beta,gamma,np.real(y[:196])) for beta,gamma,y in conv_eigv]
+                conv_imgs = [(beta,gamma,np.real(y)) for beta,gamma,y in conv_eigv]
 
-                unflattened_imgs = dict([(f"im{i})",(img[0],img[1],img[2].reshape((14,14)))) for i, img in enumerate(conv_imgs)]) #img[0:1] are parameters beta and gamma
+                unflattened_imgs = dict([(f"im{i})",(img[0],img[1],img[2])) for i, img in enumerate(conv_imgs)]) #img[0:1] are parameters beta and gamma
                 with open(os.path.join('parameters_setup',f'{comment}_under_params_dictionary_G{gammaFw}_B{betaFB}_A{alphaRec}_{alpha}.pkl'), 'wb') as f:
                     pickle.dump(unflattened_imgs, f)
             

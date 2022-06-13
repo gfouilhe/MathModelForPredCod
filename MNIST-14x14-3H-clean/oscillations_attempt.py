@@ -59,22 +59,34 @@ def main():
             actO = np.zeros((len(params_list),timeSteps+1,10))
             for i,im in enumerate(params_list):
                 beta,gamma,img = im
+                aTemp = img[:196]
+                aTemp = torch.from_numpy(aTemp.astype('float32')).to(device).view(batchSize,-1)
+                iTemp = torch.clone(aTemp)
+                bTemp = img[196:]
+                bTemp = torch.from_numpy(bTemp.astype('float32')).to(device).view(batchSize,-1)
+                oTemp = torch.zeros(batchSize, 10)
                 pcmodel = PCMLP(0.33,alphaRec=alpha,betaFB=beta,gammaFw=gamma,activation_function=activation).to(device)
                 checkpointPhase = torch.load(os.path.join('models',f"FFREC_E{numberEpochs-1}_I0_G{gammaFw}_B{betaFB}_A{alphaRec}.pth"))
                 pcmodel.load_state_dict(checkpointPhase["module"])
-                img = torch.from_numpy(img.astype('float32')).to(device)
-                aTemp = torch.zeros(batchSize, 196)
-                bTemp = torch.zeros(batchSize, 196)
-                oTemp = torch.zeros(batchSize, 10)
-                _, _ , aTemp, bTemp, oTemp, _ = pcmodel(img.view(batchSize,-1), aTemp, bTemp, oTemp, 'forward')
+
+                iTemp.requires_grad = True
+                aTemp.requires_grad = True
+                bTemp.requires_grad = True
+                oTemp.requires_grad = True
+
+                _, iTemp,_, _, _, _ = pcmodel(iTemp, aTemp, bTemp, oTemp, 'reconstruction')
+
                 actA[i,0,:] = aTemp.detach().cpu().numpy()
                 actB[i,0,:] = bTemp.detach().cpu().numpy()
                 actO[i,0,:] = oTemp.detach().cpu().numpy()
+
                 for t in range(timeSteps):
-                    _, _, aTemp, bTemp, oTemp, _ =  pcmodel(img.view(batchSize,-1), aTemp, bTemp, oTemp, 'full')
+                    
+                    _, _, aTemp, bTemp, oTemp, _ =  pcmodel(iTemp.view(batchSize,-1), aTemp, bTemp, oTemp, 'full')
                     actA[i,t+1,:] = aTemp.detach().cpu().numpy()
                     actB[i,t+1,:] = bTemp.detach().cpu().numpy()
                     actO[i,t+1,:] = oTemp.detach().cpu().numpy()
+
             normA = np.linalg.norm(actA,axis=2)
             normB = np.linalg.norm(actB,axis=2)
             normO = np.linalg.norm(actO,axis=2)
