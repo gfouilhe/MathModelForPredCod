@@ -16,10 +16,10 @@ def main():
 
     #------ Parameteters -------
 
-    mode = 'dump' # 'explode' , 'dump', 'oscillations'
+    mode = 'oscillations' # 'explode' , 'dump', 'oscillations'
 
 
-    UsedForLearningHyper = [(0.7,0.1,0.01),(0.33,0.33,0.01),(0.85,0.05,0.01),(0.95,0.01,0.01)]
+    UsedForLearningHyper =  [(0.7,0.1,0.01),(0.33,0.33,0.01),(0.85,0.05,0.01),(0.95,0.01,0.01)]
     comment = ''
     alphaR = [0.01,0.05,0.1,0.25]
     numberEpochs = 20
@@ -27,7 +27,7 @@ def main():
     commentact = 'linear' #'tanh' ; 'relu'
     
     if commentact == 'linear' :
-        activation = lambda x:x 
+        activation = lambda x: x 
     elif commentact == 'tanh':
         activation = torch.tanh
     elif commentact == 'relu':
