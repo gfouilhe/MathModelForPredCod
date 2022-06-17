@@ -14,14 +14,14 @@ from utils.getdata import get_data
 import os
 
 
-gammaFw = 0.6
+gammaFw = 0.95
 alphaRec = 0.01
-betaFB = 0.2
+betaFB = 0.01
 
 
 iterationNumber = 1
 numberEpochs = 20
-activation_function = F.tanh
+activation_function = torch.tanh
 transpose = False
 complex_valued = False
 checkpoint = [f"FF_E{numberEpochs-1}_I{it}_G{gammaFw}_B{betaFB}_A{alphaRec}.pth" for it in range(iterationNumber)]
@@ -145,11 +145,12 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs, activation_functi
                 total += labels.size(0)
 
                 _, predicted = torch.max(outputs.data, 1)
-                correct = correct + (predicted == labels).sum().item()
+                correct +=  (predicted == labels).sum().item()
 
                 total += labels.size(0)
-
-            resAll[epoch, iterationIndex] = (100 * correct / total)
+            acc = (100 * correct / total)
+            print(acc)
+            resAll[epoch, iterationIndex] = acc
             resRecLoss[0, epoch, iterationIndex] = finalLossA / total
             resRecLoss[1, epoch, iterationIndex] = finalLossB / total
 
@@ -161,5 +162,3 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs, activation_functi
 
 if __name__ == "__main__":
     main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,activation_function, transpose, complex_valued, checkpoint)
-
-

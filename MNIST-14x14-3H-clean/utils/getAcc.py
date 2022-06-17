@@ -19,12 +19,12 @@ def getMean(acc,mode='ff'):
         mean[t] = np.mean(acc[t,-1,:])
     return mean
 
-path = os.path.join('accuracies','REC__G0.95_B0.01_A0.01.npy')
+path = os.path.join('accuracies','FF__G0.95_B0.01_A0.01.npy')
 acc = np.load(path)
 
 
 
-print('Mean All : ', getMean(acc,mode='rec')[0])
+print('Mean All : ', acc)# getMean(acc,mode='ff'))
 
 # path = os.path.join('accuracies','accTrainingCET__G0.6_B0.2_A0.01.npy')
 # acc = np.load(path)
