@@ -55,7 +55,7 @@ def main(betaFw,lambdaBw,alphaRec,iterationNumber,numberEpochs,timeSteps, checkp
             checkpointPhase = torch.load(os.path.join('models',checkpoint[iterationIndex]))
             pcNet.load_state_dict(checkpointPhase["module"])
 
-        criterion = nn.BCELoss() # nn.CrossEntropyLoss() 
+        criterion = nn.BCELoss()
         optimizerPCnet = optim.Adam(pcNet.parameters(), lr=0.001)
 
         for epoch in range(0, numberEpochs):  
@@ -67,12 +67,12 @@ def main(betaFw,lambdaBw,alphaRec,iterationNumber,numberEpochs,timeSteps, checkp
             for i, data in enumerate(train_loader, 0):
 
                 
-                a1Temp = torch.zeros(batchSize, 1).to(dtype=torch.float32).cuda()
-                a2Temp = torch.zeros(batchSize, 1).to(dtype=torch.float32).cuda()
-                a3Temp = torch.zeros(batchSize, 1).to(dtype=torch.float32).cuda()
+                a1Temp = torch.randn(batchSize, 1).to(dtype=torch.float32).cuda()
+                a2Temp = torch.randn(batchSize, 1).to(dtype=torch.float32).cuda()
+                a3Temp = torch.randn(batchSize, 1).to(dtype=torch.float32).cuda()
                 inputs, labels = data
                
-                inputs, labels = inputs.to(dtype=torch.float32).to(device),labels.to(device)
+                inputs, labels = inputs.to(dtype=torch.float32).to(device),labels.to(dtype=torch.float32).to(device)
                 optimizerPCnet.zero_grad()
                 finalLoss = 0
 
@@ -81,7 +81,6 @@ def main(betaFw,lambdaBw,alphaRec,iterationNumber,numberEpochs,timeSteps, checkp
                 a3Temp.requires_grad = True
 
                 outputs, a0Temp, a1Temp, a2Temp, a3Temp, reconstruction0, reconstruction1, reconstruction2 = pcNet(inputs.view(batchSize,-1), a1Temp, a2Temp, a3Temp, 'forward')
-
                 loss = criterion(outputs.view(batchSize,-1), labels.view(batchSize,-1))
                 finalLoss += loss
                 finalLoss.backward(retain_graph=True)  
@@ -110,11 +109,12 @@ def main(betaFw,lambdaBw,alphaRec,iterationNumber,numberEpochs,timeSteps, checkp
                
                 outputs, a0Temp, a1Temp, a2Temp, a3Temp, reconstruction0, reconstruction1, reconstruction2 = pcNet(inputs.view(batchSize,-1), a1Temp, a2Temp, a3Temp, 'forward')
                 
-                _, predicted = torch.max(outputs.data, 1)
-                correct+= (predicted == labels).sum().item()
-                total += labels.size(0)
-
-            resAll[:, epoch, iterationIndex] = (100 * correct / total)
+                predicted = torch.round(outputs)
+                correct += (predicted == labels.view(batchSize,-1)).sum().item()
+                total += batchSize
+            acc = (100 * correct / total)
+            resAll[:, epoch, iterationIndex] = acc
+            print("accuracy : ", acc)
 
     np.save(os.path.join('accuracies',f"FF__B{betaFw}_L{lambdaBw}_A{alphaRec}.npy"), resAll)
     print('Finished Training')

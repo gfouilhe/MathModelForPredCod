@@ -65,6 +65,6 @@ class UniDimModel(nn.Module):
             a2 = bFw * self.activation(self.fc12(a1)) + (1 - bFw - lBw) * a2 + lBw * self.activation(self.fc32(a3))- aRec * batchSize * reconstruction1
             a3 = bFw * self.activation(self.fc23(a2)) + (1 - bFw) * a3 - aRec * batchSize * reconstruction2
         
-        output = torch.log_softmax(a3,dim=1)
+        output = torch.sigmoid(a3)
 
         return output, a0, a1, a2, a3, reconstruction0, reconstruction1, reconstruction2
