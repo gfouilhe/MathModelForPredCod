@@ -1,4 +1,4 @@
-from TrainAll import main as train
+# from TrainAll import main as train
 from TrainFFOnly import main as trainFF
 from TrainRec import main as trainRec
 import torch.nn.functional as F
