@@ -39,12 +39,12 @@ def main():
 
     # Others :
     numberEpochs = 20
-    plot = True
-    eigen_compute = True
-    oscill_compute = True
-    div_compute = True
-    dump_compute = True
-    save_imgs = False
+    plot = False
+    eigen_compute = False
+    oscill_compute = False
+    div_compute = False
+    dump_compute = False
+    save_imgs = True
     comment = ''
 
 
@@ -230,13 +230,15 @@ def main():
             
             if save_imgs:
                 print('Saving imgs...')
-                with open(os.path.join('parameters_setup',f'{comment}params_dictionary__G{gammaFw}_B{betaFB}_A{alphaRec}__G{gamma}_B{beta}_A{alpha}.pkl'), 'rb') as f:
+                with open(os.path.join('parameters_setup',f'{comment}_good_params_dictionary_G{gammaFw}_B{betaFB}_A{alphaRec}_{alpha}.pkl'), 'rb') as f:
                     unflattened_imgs = pickle.load(f)
                 unflattened_imgs_list = [img for _,img in unflattened_imgs.items()]
                 print('Number of PGO imgs : ', len(unflattened_imgs_list))
                 for i,img in enumerate(unflattened_imgs_list):
-                    _,_,img = img
-                    plt.imsave(os.path.join('PGOImgs',f'{comment}img_G{gammaFw}_B{betaFB}_A{alphaRec}__G{gamma}_B{beta}_A{alpha}_{i}.png'),img, cmap='gray')
+                    if i<10:
+                        _,_,img = img
+                        print(img.shape)
+                        plt.imsave(os.path.join('PGOImgs',f'{comment}img_G{gammaFw}_B{betaFB}_A{alphaRec}_{alpha}.png'),img, cmap='gray')
 
 if __name__ == "__main__":
     main()
