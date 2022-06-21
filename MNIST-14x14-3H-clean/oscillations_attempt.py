@@ -16,17 +16,19 @@ def main():
 
     #------ Parameteters -------
 
-    mode = 'oscillations' # 'explode' , 'dump', 'oscillations'
+    mode = 'explode' # 'explode' , 'dump', 'oscillations'
+
+    displaymode ='neurons' # 'neurons', 'layernorm'
 
      
-    long='long' # 'long' = 200 iterations instead of 50 ('')
+    long='' # 'long' = 200 iterations instead of 50 ('')
 
     UsedForLearningHyper =  [(0.7,0.1,0.01)]#,(0.33,0.33,0.01),(0.85,0.05,0.01),(0.95,0.01,0.01)]
     comment = ''
     alphaR = [0.01]#,0.05,0.1,0.25]
     numberEpochs = 20
-    timeSteps = 5000
-    commentact = 'relu' #'tanh' ; 'relu' 'linear'
+    timeSteps = 50
+    commentact = 'linear' #'tanh' ; 'relu' 'linear'
     
     if commentact == 'linear' :
         activation = lambda x: x 
@@ -57,6 +59,8 @@ def main():
 
             params_list = [param for _,param in params_and_imgs.items()]
             params_list = params_list[:20]
+
+            
             actA = np.zeros((len(params_list),timeSteps,196))
             actB = np.zeros((len(params_list),timeSteps,196))
             actO = np.zeros((len(params_list),timeSteps,10))
@@ -90,28 +94,50 @@ def main():
                     actA[i,t,:] = aTemp.detach().cpu().numpy()
                     actB[i,t,:] = bTemp.detach().cpu().numpy()
                     actO[i,t,:] = oTemp.detach().cpu().numpy()
+            
+            if displaymode=='layernorm':
 
-            normA = np.linalg.norm(actA,axis=2)
-            normB = np.linalg.norm(actB,axis=2)
-            normO = np.linalg.norm(actO,axis=2)
+                normA = np.linalg.norm(actA,axis=2)
+                normB = np.linalg.norm(actB,axis=2)
+                normO = np.linalg.norm(actO,axis=2)
 
-            for i, (gamma,beta,_) in enumerate(params_list):
+                for i, (gamma,beta,_) in enumerate(params_list):
 
-                if np.size(normA[i])==0:
-                    pass
-                else:
-                    plt.figure(figsize=(15,5))
-                    plt.subplot(1,3,1)
-                    plt.plot(normA[i])
-                    plt.title('Layer A')
-                    plt.subplot(1,3,2)
-                    plt.plot(normB[i])
-                    plt.title('Layer B')
-                    plt.subplot(1,3,3)
-                    plt.plot(normO[i])
-                    plt.title('Layer O')
-                    plt.savefig(os.path.join(f'{mode}_attempt_plot_norm',f'{long}{commentact}actplot_G{gammaFw}_B{betaFB}_A{alphaRec}_G{gamma}_B{beta}_A{alpha}_{i}.png'))
-                    plt.close()
+                    if np.size(normA[i])==0:
+                        pass
+                    else:
+                        plt.figure(figsize=(15,5))
+                        plt.subplot(1,3,1)
+                        plt.plot(normA[i])
+                        plt.title('Layer A')
+                        plt.subplot(1,3,2)
+                        plt.plot(normB[i])
+                        plt.title('Layer B')
+                        plt.subplot(1,3,3)
+                        plt.plot(normO[i])
+                        plt.title('Layer O')
+                        plt.savefig(os.path.join(f'{mode}_attempt_plot_norm',f'{long}{commentact}actplot_G{gammaFw}_B{betaFB}_A{alphaRec}_G{gamma}_B{beta}_A{alpha}_{i}.png'))
+                        plt.close()
 
+            elif displaymode=='neurons':
+
+
+                for i, (gamma,beta,_) in enumerate(params_list):
+
+                    if np.size(actA[i,:,:])==0:
+                        pass
+                    else:
+
+                        for j in range(50):
+                                
+                            plt.figure(figsize=(15,5))
+                            plt.subplot(1,2,1)
+                            plt.plot(actA[i,:,j])
+                            plt.title(f'Layer A, neuron {j}')
+                            plt.subplot(1,2,2)
+                            plt.plot(actB[i,:,j])
+                            plt.title(f'Layer B, neuron {j}')
+                            plt.savefig(os.path.join(f'{mode}_attempt_plot_norm',f'{displaymode}{long}{commentact}actplot_G{gammaFw}_B{betaFB}_A{alphaRec}_G{gamma}_B{beta}_A{alpha}_{i}_{j}.png'))
+                            plt.close()
 if __name__ == "__main__":
     main()
