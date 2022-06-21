@@ -18,13 +18,15 @@ def main():
 
     mode = 'oscillations' # 'explode' , 'dump', 'oscillations'
 
+    
+
 
     UsedForLearningHyper =  [(0.7,0.1,0.01),(0.33,0.33,0.01),(0.85,0.05,0.01),(0.95,0.01,0.01)]
     comment = ''
     alphaR = [0.01,0.05,0.1,0.25]
     numberEpochs = 20
     timeSteps = 50
-    commentact = 'linear' #'tanh' ; 'relu'
+    commentact = 'tanh' #'tanh' ; 'relu' 'linear'
     
     if commentact == 'linear' :
         activation = lambda x: x 
@@ -74,8 +76,9 @@ def main():
                 bTemp.requires_grad = True
                 oTemp.requires_grad = True
 
-                _, iTemp,_, _, _, _ = pcmodel(iTemp, aTemp, bTemp, oTemp, 'reconstruction')
-
+                _, iTemp, _, _, _, _ = pcmodel(iTemp, aTemp, bTemp, oTemp, 'reconstruction')
+                _, _ , _, _, oTemp, _ = pcmodel(iTemp, aTemp, bTemp, oTemp, 'forward')
+                
                 actA[i,0,:] = aTemp.detach().cpu().numpy()
                 actB[i,0,:] = bTemp.detach().cpu().numpy()
                 actO[i,0,:] = oTemp.detach().cpu().numpy()

@@ -62,7 +62,7 @@ class UniDimModel(nn.Module):
             reconstruction2 = torch.autograd.grad(error2, a3, retain_graph=True)[0]
 
             a1 = bFw * self.activation(self.fc01(a0)) + (1 - bFw - lBw) * a1 + lBw * self.activation(self.fc21(a2)) - aRec * batchSize * reconstruction0
-            a2 = bFw * self.activation(self.fc12(a1)) + (1 - bFw - lBw) * a2 + lBw * self.activation(self.fc32(a3))- aRec * batchSize * reconstruction1
+            a2 = bFw * self.activation(self.fc12(a1)) + (1 - bFw - lBw) * a2 + lBw * self.activation(self.fc32(a3)) - aRec * batchSize * reconstruction1
             a3 = bFw * self.activation(self.fc23(a2)) + (1 - bFw) * a3 - aRec * batchSize * reconstruction2
         
         output = torch.sigmoid(a3)
