@@ -18,15 +18,15 @@ def main():
 
     mode = 'oscillations' # 'explode' , 'dump', 'oscillations'
 
-    
+     
+    long='long' # 'long' = 200 iterations instead of 50 ('')
 
-
-    UsedForLearningHyper =  [(0.7,0.1,0.01),(0.33,0.33,0.01),(0.85,0.05,0.01),(0.95,0.01,0.01)]
+    UsedForLearningHyper =  [(0.7,0.1,0.01)]#,(0.33,0.33,0.01),(0.85,0.05,0.01),(0.95,0.01,0.01)]
     comment = ''
-    alphaR = [0.01,0.05,0.1,0.25]
+    alphaR = [0.01]#,0.05,0.1,0.25]
     numberEpochs = 20
-    timeSteps = 50
-    commentact = 'tanh' #'tanh' ; 'relu' 'linear'
+    timeSteps = 5000
+    commentact = 'relu' #'tanh' ; 'relu' 'linear'
     
     if commentact == 'linear' :
         activation = lambda x: x 
@@ -56,6 +56,7 @@ def main():
                     params_and_imgs = pickle.load(f)
 
             params_list = [param for _,param in params_and_imgs.items()]
+            params_list = params_list[:20]
             actA = np.zeros((len(params_list),timeSteps,196))
             actB = np.zeros((len(params_list),timeSteps,196))
             actO = np.zeros((len(params_list),timeSteps,10))
@@ -109,7 +110,7 @@ def main():
                     plt.subplot(1,3,3)
                     plt.plot(normO[i])
                     plt.title('Layer O')
-                    plt.savefig(os.path.join(f'{mode}_attempt_plot_norm',f'{commentact}actplot_G{gammaFw}_B{betaFB}_A{alphaRec}_G{gamma}_B{beta}_A{alpha}_{i}.png'))
+                    plt.savefig(os.path.join(f'{mode}_attempt_plot_norm',f'{long}{commentact}actplot_G{gammaFw}_B{betaFB}_A{alphaRec}_G{gamma}_B{beta}_A{alpha}_{i}.png'))
                     plt.close()
 
 if __name__ == "__main__":
