@@ -56,9 +56,9 @@ def main():
                     params_and_imgs = pickle.load(f)
 
             params_list = [param for _,param in params_and_imgs.items()]
-            actA = np.zeros((len(params_list),timeSteps+1,196))
-            actB = np.zeros((len(params_list),timeSteps+1,196))
-            actO = np.zeros((len(params_list),timeSteps+1,10))
+            actA = np.zeros((len(params_list),timeSteps,196))
+            actB = np.zeros((len(params_list),timeSteps,196))
+            actO = np.zeros((len(params_list),timeSteps,10))
             for i,im in enumerate(params_list):
                 beta,gamma,img = im
                 aTemp = img[:196]
@@ -78,17 +78,17 @@ def main():
 
                 _, iTemp, _, _, _, _ = pcmodel(iTemp, aTemp, bTemp, oTemp, 'reconstruction')
                 _, _ , _, _, oTemp, _ = pcmodel(iTemp, aTemp, bTemp, oTemp, 'forward')
-                
-                actA[i,0,:] = aTemp.detach().cpu().numpy()
-                actB[i,0,:] = bTemp.detach().cpu().numpy()
-                actO[i,0,:] = oTemp.detach().cpu().numpy()
+
+                # actA[i,0,:] = aTemp.detach().cpu().numpy()
+                # actB[i,0,:] = bTemp.detach().cpu().numpy()
+                # actO[i,0,:] = oTemp.detach().cpu().numpy()
 
                 for t in range(timeSteps):
                     
                     _, _, aTemp, bTemp, oTemp, _ =  pcmodel(iTemp.view(batchSize,-1), aTemp, bTemp, oTemp, 'full')
-                    actA[i,t+1,:] = aTemp.detach().cpu().numpy()
-                    actB[i,t+1,:] = bTemp.detach().cpu().numpy()
-                    actO[i,t+1,:] = oTemp.detach().cpu().numpy()
+                    actA[i,t,:] = aTemp.detach().cpu().numpy()
+                    actB[i,t,:] = bTemp.detach().cpu().numpy()
+                    actO[i,t,:] = oTemp.detach().cpu().numpy()
 
             normA = np.linalg.norm(actA,axis=2)
             normB = np.linalg.norm(actB,axis=2)
