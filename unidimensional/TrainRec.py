@@ -56,7 +56,7 @@ def main(betaFw,lambdaBw,alphaRec,iterationNumber,numberEpochs,timeSteps, checkp
             pcNet.load_state_dict(checkpointPhase["module"])
 
         criterionMSE = nn.functional.mse_loss
-        optimizerPCnet = optim.Adam(pcNet.parameters(), lr=0.001)
+        optimizerPCnet = optim.Adam(pcNet.parameters(), lr=0.0001)
 
         for epoch in range(0, numberEpochs):  
 

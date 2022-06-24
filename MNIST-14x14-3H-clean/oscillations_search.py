@@ -18,6 +18,11 @@ def RhoCloseToOne(rho,l,over,under,beta,gamma,tol1 = 10**-2,tolover = 0.5, tolun
     elif rho < 1 - tolunder :
         under.append((beta,gamma))
 
+batchSize = 1
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(device)
+activation = torch.tanh
+
 def main():
     
     #-------Parameters-----
@@ -236,9 +241,27 @@ def main():
                 print('Number of PGO imgs : ', len(unflattened_imgs_list))
                 for i,img in enumerate(unflattened_imgs_list):
                     if i<10:
-                        _,_,img = img
-                        print(img.shape)
-                        plt.imsave(os.path.join('PGOImgs',f'{comment}img_G{gammaFw}_B{betaFB}_A{alphaRec}_{alpha}.png'),img, cmap='gray')
+
+                        beta,gamma,img = img
+                        aTemp = img[:196]
+                        aTemp = torch.from_numpy(aTemp.astype('float32')).to(device).view(batchSize,-1)
+                        iTemp = torch.clone(aTemp)
+                        bTemp = img[196:]
+                        bTemp = torch.from_numpy(bTemp.astype('float32')).to(device).view(batchSize,-1)
+                        oTemp = torch.zeros(batchSize, 10)
+                        pcmodel = PCMLP(0.33,alphaRec=alpha,betaFB=beta,gammaFw=gamma,activation_function=activation).to(device)
+                        checkpointPhase = torch.load(os.path.join('models',f"FFREC_E{numberEpochs-1}_I0_G{gammaFw}_B{betaFB}_A{alphaRec}.pth"))
+                        pcmodel.load_state_dict(checkpointPhase["module"])
+
+                        iTemp.requires_grad = True
+                        aTemp.requires_grad = True
+                        bTemp.requires_grad = True
+                        oTemp.requires_grad = True
+
+                        _, iTemp, _, _, _, _ = pcmodel(iTemp, aTemp, bTemp, oTemp, 'reconstruction')
+                        
+                        iTemp = iTemp.detach().cpu().numpy().reshape((14,14))
+                        plt.imsave(os.path.join('PGOImgs',f'{comment}img_G{gammaFw}_B{betaFB}_A{alphaRec}_{alpha}.png'),iTemp, cmap='gray')
 
 if __name__ == "__main__":
     main()

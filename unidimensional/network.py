@@ -7,7 +7,7 @@ import torch.nn.functional as F
 
 class UniDimModel(nn.Module):
 
-    def __init__(self, memory, alphaRec, betaFw, lambdaBw):
+    def __init__(self, memory, alphaRec, betaFw, lambdaBw, activation_function=torch.tanh):
 
         super(UniDimModel,self).__init__()
 
@@ -21,7 +21,7 @@ class UniDimModel(nn.Module):
         self.fc21 = nn.Linear(1,1)
         self.fc23 = nn.Linear(1,1)
         self.fc32 = nn.Linear(1,1)
-        self.activation = torch.tanh
+        self.activation = activation_function
         self.MSE = nn.functional.mse_loss
 
     def forward(self, a0, a1, a2, a3, mode='forward'):

@@ -29,13 +29,13 @@ def main():
     #
 
     # Parameters used for learning :
-    UsedForLearningHyper = [(0.6,0.2,0.01)] #,(0.33,0.33,0.01),(0.85,0.05,0.01),(0.95,0.01,0.01)]
+    UsedForLearningHyper = [(0.6,0.2,0.01),(0.33,0.33,0.01),(0.5,0.25,0.01),(0.7,0.1,0.01),(0.85,0.05,0.01),(0.95,0.01,0.01)]
     #
 
     # Tolerences :
-    tolOne = 0.01
-    tolOver = 0.5
-    tolUnder = 0.2
+    tolOne = 0.001
+    tolOver = 0.01
+    tolUnder = 0.01
 
     # Others :
     numberEpochs = 20
@@ -57,17 +57,17 @@ def main():
         for name, p in model.named_parameters():
             tmp = p.detach().numpy()
             if name=='fc12.weight':
-                W12 = tmp
+                W12 = tmp[0][0]
             if name=='fc21.weight':
-                W21 = tmp
+                W21 = tmp[0][0]
             if name=='fc01.weight':
-                W01 = tmp
+                W01 = tmp[0][0]
             if name=='fc10.weight':
-                W10 = tmp
+                W10 = tmp[0][0]
             if name=='fc23.weight':
-                W23 = tmp
+                W23 = tmp[0][0]
             if name=='fc32.weight':
-                W32 = tmp
+                W32 = tmp[0][0]
 
         
         
@@ -120,9 +120,9 @@ def main():
                 if not len(over_one) == 0 :
                     plt.scatter(*zip(*over_one),color='blue',label=f'$\\rho$ > {1+tolOver}',s=0.1)
                 if not len(under_one) == 0:
-                    plt.scatter(*zip(*under_one),color='green',label=f'$\\rho$< {1-tolUnder}',s=0.1)
+                    plt.scatter(*zip(*under_one),color='green',label=f'$\\rho$ < {1-tolUnder}',s=0.1)
                 if not len(good_params) == 0:
-                    plt.scatter(*zip(*good_params),color='red',label='$\\rho$ = 1',s=0.5)
+                    plt.scatter(*zip(*good_params),color='red',label=f'$\\rho$ = 1 +/- {tolOne}',s=0.5)
                 plt.scatter(lambdaBw,betaFw, label='Used during learning')
                 x = np.linspace(0,1,100)
                 plt.plot(x,1-x,linestyle='dashed',label='$\lambda+\\beta = 1$',color='red')
@@ -158,7 +158,7 @@ def main():
 
                     Inv = np.linalg.inv(np.eye(3)- beta*Wf)
 
-                    A = Inv.dot((lamb*Wb + D + alpha*E)).asfptype()
+                    A = Inv.dot((lamb*Wb + D + alpha*E))
 
                     w, v = np.linalg.eig(A)
                     for i,eig in enumerate(w):
@@ -196,12 +196,11 @@ def main():
 
                     Inv = np.linalg.inv(np.eye(3)- beta*Wf)
 
-                    A = Inv.dot((lamb*Wb + D + alpha*E)).asfptype()
-
+                    A = Inv.dot((lamb*Wb + D + alpha*E))
                     w, v = np.linalg.eig(A)
 
                     for i,eig in enumerate(w):
-                        if np.isreal(eig) or (abs(eig) - 1 > tolOver and abs(eig)> 1) :
+                        if (abs(eig) - 1 > tolOver and abs(eig)> 1) :
                             pass
                         else:
                             #print(eig)
@@ -234,11 +233,11 @@ def main():
 
                     Inv = np.linalg.inv(np.eye(3)- beta*Wf)
 
-                    A = Inv.dot((lamb*Wb + D + alpha*E)).asfptype()
+                    A = Inv.dot((lamb*Wb + D + alpha*E))
 
                     w, v = np.linalg.eig(A)
                     for i,eig in enumerate(w):
-                        if np.isreal(eig) or (1 - abs(eig) > tolOver and abs(eig)<1):
+                        if (1 - abs(eig) > tolOver and abs(eig)<1):
                             pass
                         else:
                             #print(eig)
