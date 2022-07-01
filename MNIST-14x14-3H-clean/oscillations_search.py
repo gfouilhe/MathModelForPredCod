@@ -221,7 +221,12 @@ def main():
 
                     w, v = np.linalg.eig(A)
                     for i,eig in enumerate(w):
-                        if np.isreal(eig) or (1 - abs(eig) > tolOver and abs(eig)<1):
+                        # if np.isreal(eig) or (1 - abs(eig) > tolOver and abs(eig)<1):
+                        #     pass
+                        # else:
+                        #     #print(eig)
+                        #     conv_eigv.append((beta,gamma,v[i]))
+                        if np.isreal(eig) or not (1 - abs(eig) > tolOver and abs(eig)<1):
                             pass
                         else:
                             #print(eig)

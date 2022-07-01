@@ -125,10 +125,13 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,timeSteps, activat
                 outputs, iTemp, aTemp, bTemp, oTemp, reconstruction = pcNet(inputs.view(batchSize,-1), aTemp, bTemp, oTemp, 'forward')
                 
                 _, predicted = torch.max(outputs.data, 1)
-                correct+= (predicted == labels).sum().item()
+                correct += (predicted == labels).sum().item()
                 total += labels.size(0)
-
-            resAll[:, epoch, iterationIndex] = (100 * correct / total)
+                print('correct :',correct)
+                print('total : ', total)
+            acc = (100 * correct / total)
+            print(acc)
+            resAll[:, epoch, iterationIndex] = acc
 
     np.save(os.path.join('accuracies',f"FF__G{gammaFw}_B{betaFB}_A{alphaRec}.npy"), resAll)
     print('Finished Training')

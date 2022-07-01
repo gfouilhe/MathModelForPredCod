@@ -200,10 +200,7 @@ def main():
                     w, v = np.linalg.eig(A)
 
                     for i,eig in enumerate(w):
-                        if (abs(eig) - 1 > tolOver and abs(eig)> 1) :
-                            pass
-                        else:
-                            #print(eig)
+                        if abs(eig)> 1 + tolOver:
                             div_eigv.append((lamb,beta,v[i]))
 
                 div_imgs = [(lamb,beta,np.real(y)) for lamb,beta,y in div_eigv]
@@ -237,10 +234,7 @@ def main():
 
                     w, v = np.linalg.eig(A)
                     for i,eig in enumerate(w):
-                        if (1 - abs(eig) > tolOver and abs(eig)<1):
-                            pass
-                        else:
-                            #print(eig)
+                        if abs(eig) < 1 - tolUnder:
                             conv_eigv.append((lamb,beta,v[i]))
 
                 conv_imgs = [(lamb,beta,np.real(y)) for lamb,beta,y in conv_eigv]

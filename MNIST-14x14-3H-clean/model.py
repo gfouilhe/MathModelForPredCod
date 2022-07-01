@@ -120,7 +120,7 @@ class PCMLP(nn.Module):
 
 
                 aNew = gammaFw * self.activation(self.fciA(i)) + (1 - gammaFw - betaBw) * a + betaBw * self.activation(self.fcBA(b)) - self.alphaRec * batchSize * reconstructionI
-                bNew = gammaFw * self.activation(self.fcAB(aNew)) + + (1 - gammaFw) * b - self.alphaRec * batchSize * reconstructionA
+                bNew = gammaFw * self.activation(self.fcAB(aNew)) + (1 - gammaFw) * b - self.alphaRec * batchSize * reconstructionA
                 oNew = self.fcout(bNew)
 
             if self.complex_valued:

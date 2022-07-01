@@ -137,17 +137,18 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs, activation_functi
                     inputs, labels = inputs.to(dtype=torch.float32).to(device),labels.to(device)
 
                 outputs, iTemp, aTemp, bTemp, oTemp, reconstruction = pcNet(inputs.view(batchSize,-1), aTemp, bTemp, oTemp, 'forward')
-                _, iR, aR, bR, oR, reconstruction = pcNet(inputs.view(batchSize,-1), aTemp, bTemp, oTemp, 'reconstruction')
+                outputs, iR, aR, bR, oR, reconstruction = pcNet(inputs.view(batchSize,-1), aTemp, bTemp, oTemp, 'reconstruction')
 
                 finalLossA += criterionMSE(inputs.view(batchSize,-1), iR)
                 finalLossB += criterionMSE(aTemp.view(batchSize,-1), aR)
 
-                total += labels.size(0)
-
                 _, predicted = torch.max(outputs.data, 1)
+                print(labels.shape)
                 correct +=  (predicted == labels).sum().item()
-
+                
                 total += labels.size(0)
+                print('correct :',correct)
+                print('total : ', total)
             acc = (100 * correct / total)
             print(acc)
             resAll[epoch, iterationIndex] = acc

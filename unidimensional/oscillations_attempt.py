@@ -16,7 +16,7 @@ def main():
 
     #------ Parameteters -------
 
-    mode = 'explode' # 'explode' , 'dump', 'oscillations'
+    mode = 'oscillations' # 'explode' , 'dump', 'oscillations'
 
     displaymode ='neurons' # 'neurons', 'layernorm'
 
