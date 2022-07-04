@@ -61,7 +61,7 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs, activation_functi
             pcNet.load_state_dict(checkpointPhase["module"])
 
         criterionMSE = nn.functional.mse_loss
-        optimizerPCnet = optim.Adam(pcNet.parameters(), lr=0.001)
+        optimizerPCnet = optim.SGD(pcNet.parameters(), lr=0.01, momentum=0.9)
 
         for epoch in range(0, numberEpochs):  
 
@@ -72,13 +72,13 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs, activation_functi
             for i, data in enumerate(train_loader, 0):
 
                 if complex_valued:
-                    aTemp = torch.zeros(batchSize, 196).to(dtype=torch.complex64).cuda()
-                    bTemp = torch.zeros(batchSize, 196).to(dtype=torch.complex64).cuda()
-                    oTemp = torch.zeros(batchSize, 10).to(dtype=torch.complex64).cuda()
+                    aTemp = torch.randn(batchSize, 196).to(dtype=torch.complex64).cuda()
+                    bTemp = torch.randn(batchSize, 196).to(dtype=torch.complex64).cuda()
+                    oTemp = torch.randn(batchSize, 10).to(dtype=torch.complex64).cuda()
                 else:
-                    aTemp = torch.zeros(batchSize, 196).to(dtype=torch.float32).cuda()
-                    bTemp = torch.zeros(batchSize, 196).to(dtype=torch.float32).cuda()
-                    oTemp = torch.zeros(batchSize, 10).to(dtype=torch.float32).cuda()
+                    aTemp = torch.randn(batchSize, 196).to(dtype=torch.float32).cuda()
+                    bTemp = torch.randn(batchSize, 196).to(dtype=torch.float32).cuda()
+                    oTemp = torch.randn(batchSize, 10).to(dtype=torch.float32).cuda()
 
                 inputs, labels = data
                 if complex_valued:
@@ -117,13 +117,13 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs, activation_functi
             for _, data in enumerate(test_loader, 0):
 
                 if complex_valued:
-                    aTemp = torch.zeros(batchSize, 196).to(dtype=torch.complex64).cuda()
-                    bTemp = torch.zeros(batchSize, 196).to(dtype=torch.complex64).cuda()
-                    oTemp = torch.zeros(batchSize, 10).to(dtype=torch.complex64).cuda()
+                    aTemp = torch.randn(batchSize, 196).to(dtype=torch.complex64).cuda()
+                    bTemp = torch.randn(batchSize, 196).to(dtype=torch.complex64).cuda()
+                    oTemp = torch.randn(batchSize, 10).to(dtype=torch.complex64).cuda()
                 else:
-                    aTemp = torch.zeros(batchSize, 196).to(dtype=torch.float32).cuda()
-                    bTemp = torch.zeros(batchSize, 196).to(dtype=torch.float32).cuda()
-                    oTemp = torch.zeros(batchSize, 10).to(dtype=torch.float32).cuda()
+                    aTemp = torch.randn(batchSize, 196).to(dtype=torch.float32).cuda()
+                    bTemp = torch.randn(batchSize, 196).to(dtype=torch.float32).cuda()
+                    oTemp = torch.randn(batchSize, 10).to(dtype=torch.float32).cuda()
 
                 aTemp.requires_grad = True
                 bTemp.requires_grad = True
@@ -143,14 +143,11 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs, activation_functi
                 finalLossB += criterionMSE(aTemp.view(batchSize,-1), aR)
 
                 _, predicted = torch.max(outputs.data, 1)
-                print(labels.shape)
                 correct +=  (predicted == labels).sum().item()
                 
                 total += labels.size(0)
-                print('correct :',correct)
-                print('total : ', total)
             acc = (100 * correct / total)
-            print(acc)
+            print('Accuracy (fb) : ', acc)
             resAll[epoch, iterationIndex] = acc
             resRecLoss[0, epoch, iterationIndex] = finalLossA / total
             resRecLoss[1, epoch, iterationIndex] = finalLossB / total

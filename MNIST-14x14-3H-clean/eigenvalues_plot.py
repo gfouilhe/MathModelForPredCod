@@ -8,13 +8,13 @@ def main():
 
     g = []
     b = []
-    alphaR = [0.01,0.05,0.1,0.5,1,100]
+    alphaR = [0]#0.01,0.05,0.1,0.5,1,10,  100]
     numberEpochs = 20
 
     # gammaR = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
     # betaR = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
 
-    trained_params_couples = [(0.0,0.5)]#,(0.0,0.7),(0.0,0.9),(0.0,0.2),(0.0,0.05)]#,(0.33,0.33),(0.5,0.25),(0.7,0.1),(0.85,0.05),(0.95,0.01),(0.2,0.2),(0.1,0.7),(0.25,0.5),(0.05,0.85)]#[(gamma,beta,alpha) for gamma in gammaR for beta in betaR if beta+gamma <= 1]
+    trained_params_couples = [(0.33,0.33),(0.5,0.25),(0.7,0.1),(0.85,0.05),(0.95,0.01)]
 
     for gamma, beta in trained_params_couples:
 

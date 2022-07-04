@@ -58,7 +58,7 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,timeSteps, activat
             pcNet.load_state_dict(checkpointPhase["module"])
 
         criterion = nn.CrossEntropyLoss()
-        optimizerPCnet = optim.Adam(pcNet.parameters(), lr=0.001)
+        optimizerPCnet = optim.SGD(pcNet.parameters(), lr=0.01, momentum=0.9)
 
         for epoch in range(0, numberEpochs):  
 
@@ -127,10 +127,8 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,timeSteps, activat
                 _, predicted = torch.max(outputs.data, 1)
                 correct += (predicted == labels).sum().item()
                 total += labels.size(0)
-                print('correct :',correct)
-                print('total : ', total)
             acc = (100 * correct / total)
-            print(acc)
+            print("Accuracy (ff) : ",acc)
             resAll[:, epoch, iterationIndex] = acc
 
     np.save(os.path.join('accuracies',f"FF__G{gammaFw}_B{betaFB}_A{alphaRec}.npy"), resAll)
