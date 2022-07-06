@@ -61,6 +61,7 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs, activation_functi
             pcNet.load_state_dict(checkpointPhase["module"])
 
         criterionMSE = nn.functional.mse_loss
+        criterionCE = nn.CrossEntropyLoss()
         optimizerPCnet = optim.SGD(pcNet.parameters(), lr=0.01, momentum=0.9)
 
         for epoch in range(0, numberEpochs):  
@@ -98,8 +99,9 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs, activation_functi
 
                 lossA = criterionMSE(inputs.view(batchSize,-1), iR)
                 lossB = criterionMSE(aTemp.view(batchSize,-1), aR)
+                lossAcc = criterionCE(outputs,labels)
 
-                finalLoss = lossA + lossB
+                finalLoss = lossA + lossB + 0.5*lossAcc
 
                 finalLoss.backward(retain_graph=True)  
                 optimizerPCnet.step()
