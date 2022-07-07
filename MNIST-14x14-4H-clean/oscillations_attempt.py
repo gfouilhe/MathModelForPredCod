@@ -16,19 +16,19 @@ def main():
 
     #------ Parameteters -------
 
-    mode = 'oscillations' # 'explode' , 'dump', 'oscillations'
+    mode = 'dump' # 'explode' , 'dump', 'oscillations'
 
     displaymode ='layernorm' # 'neurons', 'layernorm'
 
      
-    long='long' # 'long' = 200 time iterations instead of 50 ('')
+    long='' # 'long' = 200 time iterations instead of 50 ('')
 
-    UsedForLearningHyper =  [(0.7,0.1,0.01),(0.33,0.33,0.01),(0.85,0.05,0.01),(0.95,0.01,0.01)]
+    UsedForLearningHyper =  [(0.1,0.5,0.01), (0.1,0.1,0.01),(0.33,0.33,0.01),(0.2,0.5,0.01),(0.5,0.2,0.01),(0.5,0.1,0.01),(0.8,0.1,0.01)]
     comment = ''
     alphaR = [0.01]#,0.05,0.1,0.25]
-    numberEpochs = 20
-    timeSteps = 500
-    commentact = 'linear' #'tanh' ; 'relu' 'linear'
+    numberEpochs = 15
+    timeSteps = 200
+    commentact = 'tanh' #'tanh' ; 'relu' 'linear'
     
     if commentact == 'linear' :
         activation = lambda x: x 
@@ -54,22 +54,25 @@ def main():
                 path = os.path.join('parameters_setup',f'{comment}_under_params_dictionary_G{gammaFw}_B{betaFB}_A{alphaRec}_{alpha}.pkl')
 
             with open(path,'rb') as f:
-                    params_and_imgs = pickle.load(f)
+                params_and_imgs = pickle.load(f)
 
             params_list = [param for _,param in params_and_imgs.items()]
-            params_list = params_list[:20]
+            params_list = params_list[:10]
 
             
             actA = np.zeros((len(params_list),timeSteps,196))
             actB = np.zeros((len(params_list),timeSteps,196))
+            actC = np.zeros((len(params_list),timeSteps,196))
             actO = np.zeros((len(params_list),timeSteps,10))
             for i,im in enumerate(params_list):
                 beta,gamma,img = im
                 aTemp = img[:196]
                 aTemp = torch.from_numpy(aTemp.astype('float32')).to(device).view(batchSize,-1)
                 iTemp = torch.clone(aTemp)
-                bTemp = img[196:]
+                bTemp = img[196:392]
                 bTemp = torch.from_numpy(bTemp.astype('float32')).to(device).view(batchSize,-1)
+                cTemp = img[392:]
+                cTemp = torch.from_numpy(cTemp.astype('float32')).to(device).view(batchSize,-1)
                 oTemp = torch.zeros(batchSize, 10)
                 pcmodel = PCMLP(0.33,alphaRec=alpha,betaFB=beta,gammaFw=gamma,activation_function=activation).to(device)
                 checkpointPhase = torch.load(os.path.join('models',f"FFREC_E{numberEpochs-1}_I0_G{gammaFw}_B{betaFB}_A{alphaRec}.pth"))
@@ -78,26 +81,25 @@ def main():
                 iTemp.requires_grad = True
                 aTemp.requires_grad = True
                 bTemp.requires_grad = True
+                cTemp.requires_grad = True
                 oTemp.requires_grad = True
 
-                _, iTemp, _, _, _, _ = pcmodel(iTemp, aTemp, bTemp, oTemp, 'reconstruction')
-                _, _ , _, _, oTemp, _ = pcmodel(iTemp, aTemp, bTemp, oTemp, 'forward')
-
-                # actA[i,0,:] = aTemp.detach().cpu().numpy()
-                # actB[i,0,:] = bTemp.detach().cpu().numpy()
-                # actO[i,0,:] = oTemp.detach().cpu().numpy()
+                _, iTemp, _, _, _, _, _ , _, _ = pcmodel(iTemp, aTemp, bTemp, cTemp, oTemp, 'reconstruction')
+                _, _ , _, _, oTemp, _, _, _, _ = pcmodel(iTemp, aTemp, bTemp, cTemp, oTemp, 'forward')
 
                 for t in range(timeSteps):
                     
-                    _, _, aTemp, bTemp, oTemp, _ =  pcmodel(iTemp.view(batchSize,-1), aTemp, bTemp, oTemp, 'full')
+                    _, _, aTemp, bTemp, cTemp, oTemp, _, _, _ =  pcmodel(iTemp.view(batchSize,-1), aTemp, bTemp, cTemp, oTemp, 'full')
                     actA[i,t,:] = aTemp.detach().cpu().numpy()
                     actB[i,t,:] = bTemp.detach().cpu().numpy()
+                    actC[i,t,:] = cTemp.detach().cpu().numpy()
                     actO[i,t,:] = oTemp.detach().cpu().numpy()
             
             if displaymode=='layernorm':
 
                 normA = np.linalg.norm(actA,axis=2)
                 normB = np.linalg.norm(actB,axis=2)
+                normC = np.linalg.norm(actC,axis=2)
                 normO = np.linalg.norm(actO,axis=2)
 
                 for i, (gamma,beta,_) in enumerate(params_list):
@@ -106,13 +108,16 @@ def main():
                         pass
                     else:
                         plt.figure(figsize=(15,5))
-                        plt.subplot(1,3,1)
+                        plt.subplot(1,4,1)
                         plt.plot(normA[i])
                         plt.title('Layer A')
-                        plt.subplot(1,3,2)
+                        plt.subplot(1,4,2)
                         plt.plot(normB[i])
                         plt.title('Layer B')
-                        plt.subplot(1,3,3)
+                        plt.subplot(1,4,3)
+                        plt.plot(normC[i])
+                        plt.title('Layer C')
+                        plt.subplot(1,4,4)
                         plt.plot(normO[i])
                         plt.title('Layer O')
                         plt.savefig(os.path.join(f'{mode}_attempt_plot_norm',f'{long}{commentact}actplot_G{gammaFw}_B{betaFB}_A{alphaRec}_G{gamma}_B{beta}_A{alpha}_{i}.png'))
