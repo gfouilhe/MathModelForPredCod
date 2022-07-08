@@ -33,7 +33,7 @@ x, y = np.meshgrid(nurerange, nuimrange)
 nu = complexHD(x,y)
 
 
-betaR = list(np.arange(0,1,0.1))
+betaR = [0] #list(np.arange(0,1,0.1))
 lambdaR = list(np.arange(0,1,0.1))
 alphaR = [0.01,0.1,1]
 

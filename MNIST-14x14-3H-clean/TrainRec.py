@@ -26,8 +26,9 @@ transpose = False
 complex_valued = False
 checkpoint = [f"FF_E{numberEpochs-1}_I{it}_G{gammaFw}_B{betaFB}_A{alphaRec}.pth" for it in range(iterationNumber)]
 
+mu = 0.5
 
-def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs, activation_function, transpose, complex_valued, checkpoint):
+def main(mu, gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs, activation_function, transpose, complex_valued, checkpoint):
 
     assert checkpoint != 0, 'Reconstuction should be used with a checkpoint from FF learned weights'
 
@@ -101,7 +102,7 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs, activation_functi
                 lossB = criterionMSE(aTemp.view(batchSize,-1), aR)
                 lossAcc = criterionCE(outputs,labels)
 
-                finalLoss = lossA + lossB + 0.5*lossAcc
+                finalLoss = lossA + lossB + mu*lossAcc
 
                 finalLoss.backward(retain_graph=True)  
                 optimizerPCnet.step()
@@ -161,4 +162,4 @@ def main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs, activation_functi
 
 
 if __name__ == "__main__":
-    main(gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,activation_function, transpose, complex_valued, checkpoint)
+    main(mu, gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs,activation_function, transpose, complex_valued, checkpoint)

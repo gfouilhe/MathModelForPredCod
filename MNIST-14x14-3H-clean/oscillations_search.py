@@ -28,28 +28,28 @@ def main():
     #-------Parameters-----
 
     # These are the parameters used for computing eigenvalues, not those used to learn the weights.
-    alphaR = [0.01,0.05,0.1,0.25]
+    alphaR = [0.01]#,0.05,0.1,0.25]
     betaR = list(np.arange(0,1,0.005))[1:] 
     gammaR = list(np.arange(0,1,0.005))[1:]
     #
 
     # Parameters used for learning :
-    UsedForLearningHyper = [(0.7,0.1,0.01),(0.33,0.33,0.01),(0.85,0.05,0.01),(0.95,0.01,0.01)]
+    UsedForLearningHyper = [(0.7,0.1,0.01)]#[(0.1,0.8, 0.01), (0.1,0.5,0.01), (0.1,0.1,0.01),(0.33,0.33,0.01),(0.2,0.5,0.01),(0.5,0.2,0.01),(0.5,0.1,0.01),(0.8,0.1,0.01)]
     #
 
     # Tolerences :
-    tolOne = 0.01
-    tolOver = 0.5
-    tolUnder = 0.2
+    tolOne = 0.001
+    tolOver = 0.01
+    tolUnder = 0.01
 
     # Others :
-    numberEpochs = 20
-    plot = False
-    eigen_compute = False
+    numberEpochs = 10
+    plot = True
+    eigen_compute = True
     oscill_compute = False
     div_compute = False
     dump_compute = False
-    save_imgs = True
+    save_imgs = False
     comment = ''
 
 
@@ -114,9 +114,9 @@ def main():
                             pass
                         else:
 
-                            A11 = (1-beta-gamma) * np.eye(d)
+                            A11 = (1-beta-gamma) * np.eye(d) - alpha/d * W10.T.dot(W10)
                             A12 = beta * W21
-                            A21 = (1-beta-gamma) * gamma * W12 + alpha/d * W21.T
+                            A21 = (1-beta-gamma) * gamma * W12 - alpha/d * gamma * W12.dot(W10.T.dot(W10)) + alpha/d * W21.T
                             A22 = gamma * beta * W12.dot(W21) + (1-gamma) * np.eye(d) - alpha/d * W21.T.dot(W21)
 
                             A = np.block([[A11,A12],[A21,A22]])
@@ -136,9 +136,12 @@ def main():
             if plot:
                 print('Saving plots...')
                 plt.figure()
-                plt.scatter(*zip(*over_one),color='blue',label=f'$\\rho$ > {1+tolOver}',s=0.1)
-                plt.scatter(*zip(*under_one),color='green',label=f'$\\rho$< {1-tolUnder}',s=0.1)
-                plt.scatter(*zip(*good_params),color='red',label='$\\rho$ = 1',s=0.5)
+                if not len(over_one) ==0 :
+                    plt.scatter(*zip(*over_one),color='blue',label=f'$\\rho$ > {1+tolOver}',s=0.1)
+                if not len(under_one) ==0 :
+                    plt.scatter(*zip(*under_one),color='green',label=f'$\\rho$ < {1-tolUnder}',s=0.1)
+                if not len(good_params) ==0 :
+                    plt.scatter(*zip(*good_params),color='red',label=f'$\\rho$ = 1 +-{tolOne}',s=0.5)
                 plt.scatter(betaFB,gammaFw, label='Used during learning')
                 x = np.linspace(0,1,100)
                 plt.plot(x,1-x,linestyle='dashed',label='$\lambda+\\beta = 1$',color='red')
@@ -160,9 +163,9 @@ def main():
                 for beta,gamma in good_params:
                     
 
-                    A11 = (1-beta-gamma) * np.eye(d)
+                    A11 = (1-beta-gamma) * np.eye(d) - alpha/d * W10.T.dot(W10)
                     A12 = beta * W21
-                    A21 = (1-beta-gamma) * gamma * W12 + alpha/d * W21.T
+                    A21 = (1-beta-gamma) * gamma * W12 - alpha/d * gamma * W12.dot(W10.T.dot(W10)) + alpha/d * W21.T
                     A22 = gamma * beta * W12.dot(W21) + (1-gamma) * np.eye(d) - alpha/d * W21.T.dot(W21)
                     A = np.block([[A11,A12],[A21,A22]])
 
@@ -187,9 +190,9 @@ def main():
 
                 for beta,gamma in over_one:
                     
-                    A11 = (1-beta-gamma) * np.eye(d)
+                    A11 = (1-beta-gamma) * np.eye(d) - alpha/d * W10.T.dot(W10)
                     A12 = beta * W21
-                    A21 = (1-beta-gamma) * gamma * W12 + alpha/d * W21.T
+                    A21 = (1-beta-gamma) * gamma * W12 - alpha/d * gamma * W12.dot(W10.T.dot(W10)) + alpha/d * W21.T
                     A22 = gamma * beta * W12.dot(W21) + (1-gamma) * np.eye(d) - alpha/d * W21.T.dot(W21)
                     A = np.block([[A11,A12],[A21,A22]])
 
@@ -213,9 +216,9 @@ def main():
 
                 for beta,gamma in under_one:
                     
-                    A11 = (1-beta-gamma) * np.eye(d)
+                    A11 = (1-beta-gamma) * np.eye(d) - alpha/d * W10.T.dot(W10)
                     A12 = beta * W21
-                    A21 = (1-beta-gamma) * gamma * W12 + alpha/d * W21.T
+                    A21 = (1-beta-gamma) * gamma * W12 - alpha/d * gamma * W12.dot(W10.T.dot(W10)) + alpha/d * W21.T
                     A22 = gamma * beta * W12.dot(W21) + (1-gamma) * np.eye(d) - alpha/d * W21.T.dot(W21)
                     A = np.block([[A11,A12],[A21,A22]])
 
