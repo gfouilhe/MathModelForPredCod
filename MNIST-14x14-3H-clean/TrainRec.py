@@ -65,7 +65,7 @@ def main(mu, gammaFw,betaFB,alphaRec,iterationNumber,numberEpochs, activation_fu
         criterionCE = nn.CrossEntropyLoss()
         optimizerPCnet = optim.SGD(pcNet.parameters(), lr=0.01, momentum=0.9)
 
-        for epoch in range(0, numberEpochs):  
+        for epoch in range(0, numberEpochs):
 
             print('it : ',iterationIndex)
             print('epoch : ',epoch)
