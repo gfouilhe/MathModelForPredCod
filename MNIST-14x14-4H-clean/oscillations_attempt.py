@@ -16,14 +16,14 @@ def main():
 
     #------ Parameteters -------
 
-    mode = 'explode' # 'explode' , 'dump', 'oscillations'
+    mode = 'oscillations' # 'explode' , 'dump', 'oscillations'
 
     displaymode ='layernorm' # 'neurons', 'layernorm'
 
      
     long='' # 'long' = 200 time iterations instead of 50 ('')
 
-    UsedForLearningHyper =  [(0.5,0.2,0.01)]#[(0.1,0.5,0.01), (0.1,0.1,0.01),(0.33,0.33,0.01),(0.2,0.5,0.01),(0.5,0.2,0.01),(0.5,0.1,0.01),(0.8,0.1,0.01)]
+    UsedForLearningHyper =  [(0.33,0.33,0.01)]#[(0.1,0.5,0.01), (0.1,0.1,0.01),(0.33,0.33,0.01),(0.2,0.5,0.01),(0.5,0.2,0.01),(0.5,0.1,0.01),(0.8,0.1,0.01)]
     comment = ''
     alphaR = [0.01]#,0.05,0.1,0.25]
     numberEpochs = 15
@@ -57,7 +57,7 @@ def main():
                 params_and_imgs = pickle.load(f)
 
             params_list = [param for _,param in params_and_imgs.items()]
-            params_list = params_list[:10]
+            #params_list = params_list[:10]
 
             
             actA = np.zeros((len(params_list),timeSteps,196))
