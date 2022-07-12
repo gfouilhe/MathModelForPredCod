@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 def complexHD(x,y):
     M,N = x.shape
@@ -33,30 +34,35 @@ l = 0.33
 # nu = complexHD(x,y)
 
 
-betaR = [0.2] #list(np.arange(0,1,0.1))
-lambdaR = [0.2] #list(np.arange(0,1,0.1))
-alphaR = [0.01] #,0.1,1]
+betaR = [0.3] #list(np.arange(0,1,0.1))
+lambdaR = list(np.arange(0,1,0.05))[1:]
+alphaR = [0.01]#,0.1,1]
 
 thetaR = np.linspace(0,2*np.pi,50)
 
+img = 0
 
 for b in betaR:
     for l in lambdaR:
         for a in alphaR:
-
-            ax = plt.gca()
-            fig = plt.gcf()
-            ax.cla()
-            circle = plt.Circle((0,0),1,color='r',fill=False)
-            ax.add_patch(circle)
-            for theta in thetaR:
-                nu = np.complex(0,theta)
-                rho = (l*np.exp(nu) + (1 - b - l) + a/d* np.exp(-nu) - a/d)/(1-b*np.exp(-nu))
-                x, y = np.real(rho), np.imag(rho)
-                plt.scatter(x,y)
-            
-            plt.xlabel('$\Re ( \\rho )$')
-            plt.ylabel('$\Im ( \\rho )$')
-            #plt.title('$\Im (\\theta) \\neq 0$ & $\Re (\\theta) = 0$ ')
-            plt.text(0.5,0.5,f' Beta = {b} \n Lambda = {l} \n Alpha = {a} \n d = {d}')
-            plt.show()
+            if b+l > 1:
+                pass
+            else:
+                img+=1
+                ax = plt.gca()
+                fig = plt.gcf()
+                ax.cla()
+                circle = plt.Circle((0,0),1,color='r',fill=False)
+                ax.add_patch(circle)
+                for theta in thetaR:
+                    nu = np.complex(0,theta)
+                    rho = (l*np.exp(nu) + (1 - b - l) + a/d* np.exp(-nu) - a/d)/(1-b*np.exp(-nu))
+                    x, y = np.real(rho), np.imag(rho)
+                    plt.scatter(x,y)
+                
+                plt.xlabel('$\Re ( \\rho )$')
+                plt.ylabel('$\Im ( \\rho )$')
+                #plt.title('$\Im (\\theta) \\neq 0$ & $\Re (\\theta) = 0$ ')
+                plt.text(0.5,0.5,f' Beta = {b} \n Lambda = {l} \n Alpha = {a} \n d = {d}')
+                plt.savefig(os.path.join('curves',f'{img}-{b}-{l}.png'))
+                plt.close()

@@ -13,7 +13,7 @@ def main():
     timeSteps = 10
     #
     gamma_beta_couples = [(0.1,0.8), (0.1,0.5), (0.1,0.1),(0.33,0.33),(0.2,0.5),(0.5,0.2),(0.5,0.1),(0.8,0.1)]
-    alpha_range = [0.1] #,0.05,0.1,0.5]
+    alpha_range = [0.01] #,0.05,0.1,0.5]
     mode = 'FFRec' #Default (All) : train everything supervised; (Rec) means unsupervised learning for reconstruction
     already_trained_ff = []# for alpha = 0.01 :(0.1,0.8), (0.1,0.5), (0.1,0.1),(0.33,0.33),(0.2,0.5),(0.5,0.2),(0.5,0.1),(0.8,0.1)]
     already_trained_fb = []# for alpha = 0.01 :(0.1,0.8), (0.1,0.5), (0.1,0.1),(0.33,0.33),(0.2,0.5),(0.5,0.2),(0.5,0.1),(0.8,0.1)]

@@ -34,17 +34,17 @@ def main():
     #
 
     # Parameters used for learning :
-    UsedForLearningHyper = [(0.1,0.5,0.01), (0.1,0.1,0.01),(0.33,0.33,0.01),(0.2,0.5,0.01),(0.5,0.2,0.01),(0.5,0.1,0.01),(0.8,0.1,0.01)]
+    UsedForLearningHyper = [(0.1,0.8,0.01),(0.1,0.5,0.01), (0.1,0.1,0.01),(0.33,0.33,0.01),(0.2,0.5,0.01),(0.5,0.2,0.01),(0.5,0.1,0.01),(0.8,0.1,0.01)]
     #(0.1,0.8,0.01),
 
     # Tolerences :
     tolOne = 0.0005
-    tolOver = 0.1
-    tolUnder = 0.1
+    tolOver = 0.01
+    tolUnder = 0.01
 
     # Others :
     numberEpochs = 15
-    plot = False
+    plot = True
     eigen_compute = True
     oscill_compute = True
     div_compute = True
@@ -170,8 +170,8 @@ def main():
                     pickle.dump(unflattened_imgs, f)
             if div_compute:
                 print('Computing PGE...')
-                if len(over_one)>10:
-                    over_one = over_one[:10]
+                # if len(over_one)>10:
+                #     over_one = over_one[:10]
 
                 for beta,gamma in over_one:
                     
@@ -186,15 +186,12 @@ def main():
                     A33 = beta * gamma * W23 * W32 + (1-gamma) * np.eye(d) - alpha/d * W32.T.dot(W32)
                     A = np.block([[A11,A12,A13],[A21,A22,A23],[A31,A32,A33]])
 
-                    w, v = np.linalg.eig(A)
-                    for i,eig in enumerate(w):
-                        if np.isreal(eig) or (abs(eig) - 1 > tolOver and abs(eig)> 1) :
-                            pass
-                        else:
-                            #print(eig)
-                            div_eigv.append((beta,gamma,v[i]))
+                    w, v = eigs(A,k=1,which='LM',tol=10**-3) 
+                    
+                    div_eigv.append((beta,gamma,v))
 
                 div_imgs = [(beta,gamma,np.real(y)) for beta,gamma,y in div_eigv]
+                print(len(div_imgs))
 
                 unflattened_imgs = dict([(f"im{i})",(img[0],img[1],img[2])) for i, img in enumerate(div_imgs)]) #img[0:1] are parameters beta and gamma
                 with open(os.path.join('parameters_setup',f'{comment}_over_params_dictionary_G{gammaFw}_B{betaFB}_A{alphaRec}_{alpha}.pkl'), 'wb') as f:
@@ -216,18 +213,9 @@ def main():
                     A32 = beta * gamma **2 * W12.dot(W21) + (1-beta-gamma) * gamma * W23 - alpha/d * gamma * W23.dot(W21.T.dot(W21)) + alpha/d * W32.T
                     A33 = beta * gamma * W23 * W32 + (1-gamma) * np.eye(d) - alpha/d * W32.T.dot(W32)
                     A = np.block([[A11,A12,A13],[A21,A22,A23],[A31,A32,A33]])
-                    w, v = np.linalg.eig(A)
-                    for i,eig in enumerate(w):
-                        # if np.isreal(eig) or (1 - abs(eig) > tolOver and abs(eig)<1):
-                        #     pass
-                        # else:
-                        #     #print(eig)
-                        #     conv_eigv.append((beta,gamma,v[i]))
-                        if np.isreal(eig) or not (1 - abs(eig) > tolOver and abs(eig)<1):
-                            pass
-                        else:
-                            #print(eig)
-                            conv_eigv.append((beta,gamma,v[i]))
+                    w, v = eigs(A,k=1,which='LM',tol=10**-3) 
+                    
+                    conv_eigv.append((beta,gamma,v))
 
                 conv_imgs = [(beta,gamma,np.real(y)) for beta,gamma,y in conv_eigv]
 

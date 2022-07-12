@@ -84,7 +84,7 @@ class PCMLP(nn.Module):
 
             aNew = gammaFw * self.activation(self.fciA(i)) + (1 - gammaFw - betaBw) * a + betaBw * self.activation(self.fcBA(b)) - self.alphaRec * batchSize * reconstructionI
             bNew = gammaFw * self.activation(self.fcAB(aNew)) + (1 - gammaFw - betaBw) * b + betaBw * self.activation(self.fcCB(c)) - self.alphaRec * batchSize * reconstructionA
-            cNew = gammaFw * self.activation(self.fcBC(bNew)) + (1 - gammaFw) * b - self.alphaRec * batchSize * reconstructionB
+            cNew = gammaFw * self.activation(self.fcBC(bNew)) + (1 - gammaFw) * c - self.alphaRec * batchSize * reconstructionB
             oNew = self.fcout(cNew)
 
         out =  torch.log_softmax(oNew,dim=1)

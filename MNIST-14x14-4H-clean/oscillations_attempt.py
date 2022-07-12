@@ -16,19 +16,19 @@ def main():
 
     #------ Parameteters -------
 
-    mode = 'dump' # 'explode' , 'dump', 'oscillations'
+    mode = 'explode' # 'explode' , 'dump', 'oscillations'
 
     displaymode ='layernorm' # 'neurons', 'layernorm'
 
      
     long='' # 'long' = 200 time iterations instead of 50 ('')
 
-    UsedForLearningHyper =  [(0.1,0.5,0.01), (0.1,0.1,0.01),(0.33,0.33,0.01),(0.2,0.5,0.01),(0.5,0.2,0.01),(0.5,0.1,0.01),(0.8,0.1,0.01)]
+    UsedForLearningHyper =  [(0.5,0.2,0.01)]#[(0.1,0.5,0.01), (0.1,0.1,0.01),(0.33,0.33,0.01),(0.2,0.5,0.01),(0.5,0.2,0.01),(0.5,0.1,0.01),(0.8,0.1,0.01)]
     comment = ''
     alphaR = [0.01]#,0.05,0.1,0.25]
     numberEpochs = 15
     timeSteps = 200
-    commentact = 'tanh' #'tanh' ; 'relu' 'linear'
+    commentact = 'linear' #'tanh' ; 'relu' 'linear'
     
     if commentact == 'linear' :
         activation = lambda x: x 
@@ -102,11 +102,12 @@ def main():
                 normC = np.linalg.norm(actC,axis=2)
                 normO = np.linalg.norm(actO,axis=2)
 
-                for i, (gamma,beta,_) in enumerate(params_list):
+                for i, (gamma,beta,_) in enumerate(params_list[:10]):
 
                     if np.size(normA[i])==0:
                         pass
                     else:
+                        
                         plt.figure(figsize=(15,5))
                         plt.subplot(1,4,1)
                         plt.plot(normA[i])
