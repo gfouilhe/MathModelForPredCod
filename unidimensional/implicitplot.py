@@ -105,13 +105,14 @@ plt.show()
 #                 # khi = b/(1-b)
 #                 # b_1 = -(gamma**2 - gamma + khi - khi**2)
 #                 b_1 = - (1/2*(d**2*l**2 + a**2 + (d**2*l + a*d)*b - a*d - (2*a*d + d**2)*l)/(b**2*d**2 - 2*b*d**2 + d**2) - 1/2*b/(b**2 - 2*b + 1))
-#                 if b_1 < 0:
+#                 a_1 = (l - b - a/d)/(b-1)
+#                 if a_1 < 0:
 #                     plt.scatter(b,l,c='r',s=0.5)
 # plt.xlim(0,1)
 # plt.ylim(0,1)
 # plt.xlabel('$\\beta$')
 # plt.ylabel('$\lambda$')
-# plt.title('$\\beta_1 < 0$')
+# plt.title('$\\alpha_1 < 0$')
 # plt.show()
 
 # 1/2*(d**2*l**2 + a**2 + (d**2*l + a*d)*b - a*d - (2*a*d + d**2)*l)/(b**2*d**2 - 2*b*d**2 + d**2) - 1/2*b/(b**2 - 2*b + 1)
