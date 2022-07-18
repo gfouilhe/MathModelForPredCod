@@ -23,11 +23,11 @@ def main():
      
     long='long' # 'long' = 200 time iterations instead of 50 ('')
 
-    UsedForLearningHyper =  [(0.7,0.1,0.01),(0.33,0.33,0.01),(0.85,0.05,0.01),(0.95,0.01,0.01)]
+    UsedForLearningHyper =  [(0.33,0.33,0.01)]#,(0.85,0.05,0.01),(0.95,0.01,0.01),(0.7,0.1,0.01)]
     comment = ''
     alphaR = [0.01]#,0.05,0.1,0.25]
     numberEpochs = 20
-    timeSteps = 500
+    timeSteps = 2000
     commentact = 'linear' #'tanh' ; 'relu' 'linear'
     
     if commentact == 'linear' :
