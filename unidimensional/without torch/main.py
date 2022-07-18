@@ -5,8 +5,8 @@ import matplotlib as mpl
 
 mpl.style.use('seaborn')
 #params
-b = 0.3
-l = 0.5
+b = 0.5
+l = 0.49
 a = 0.01
 d = 100
 
