@@ -35,16 +35,17 @@ l = 0.33
 # nu = complexHD(x,y)
 
 
-betaR = list(np.arange(0,1,0.1))
-lambdaR = list(np.arange(0,1,0.1))
+betaR = [0.33] #list(np.arange(0,1,0.2))[1:]
+lambdaR = [0.33] #list(np.arange(0,1,0.2))[1:]
+gammaR = [0.5,1,5,10,50,100]
 
+
+d = 196
+alphaR = list(np.arange(2*d//10,8*d//10,5))
 # blR = [(0.1,0.8), (0.1,0.5), (0.1,0.1),(0.33,0.33),(0.2,0.5),(0.5,0.2),(0.5,0.1),(0.8,0.1)]
-alphaR = list(np.arange(0,1,0.1))
 
 k = 1
 thetaR = np.linspace(-np.pi,np.pi,100)
-print(thetaR[0], thetaR[-1])
-print(np.exp(-np.complex(0,thetaR[0])),np.exp(-np.complex(0,thetaR[-1])))
 
 img = 0
 
@@ -53,47 +54,48 @@ plt.figure()
 for b in betaR:
     for l in lambdaR:
 # for b, l in blR:
-        for a in alphaR:
-            if b+l > 1:
-                pass
-            else:
-                img+=1
+        for g in gammaR:
+            for a in alphaR:
+                if b+l > 1:
+                    pass
+                else:
+                    img+=1
+                    
+                    ax = plt.gca()
+                    fig = plt.gcf()
+                    ax.cla()
+                    circle = plt.Circle((0,0),1,color='r',fill=False)
+                    ax.add_patch(circle)
+                    for theta in thetaR:
+                        nu = np.complex(0,theta)
+                        rho = (l*g*np.exp(nu) + (1 - b - l - a/d*g**2) + a/d*g* np.exp(-nu) )/(1-b*g*np.exp(-nu))
+                        x, y = np.real(rho), np.imag(rho)
+                        plt.scatter(x,y,s=0.1,c='b')
+                        # if x**2 + y**2 > 1:
+                        #     count += 1
+                        #     print('theta = ', theta)
+                        #     print(x**2 + y**2, rho)
+                        #     plt.scatter(b,l,c='b', s=0.5)
+                        #     # print(x**2 + y**2)
+                        #     # sleep(1)
                 
-                # ax = plt.gca()
-                # fig = plt.gcf()
-                # ax.cla()
-                # circle = plt.Circle((0,0),1,color='r',fill=False)
-                # ax.add_patch(circle)
-                for theta in thetaR:
-                    nu = np.complex(0,theta)
-                    rho = (l*np.exp(nu) + (1 - b - l) + a/d* np.exp(-nu) - a/d)/(1-b*np.exp(-nu))
-                    x, y = np.real(rho), np.imag(rho)
-                    # plt.scatter(x,y,s=0.1,c='b')
-                    if x**2 + y**2 > 1:
-                        count += 1
-                        print('theta = ', theta)
-                        print(x**2 + y**2, rho)
-                        plt.scatter(b,l,c='b', s=0.5)
-                        # print(x**2 + y**2)
-                        # sleep(1)
-                
-                # plt.xlabel('$\Re ( \\rho )$')
-                # plt.ylabel('$\Im ( \\rho )$')
+                plt.xlabel('$\Re ( \\rho )$')
+                plt.ylabel('$\Im ( \\rho )$')
                 # plt.title('$\Im (\\theta) \\neq 0$ & $\Re (\\theta) = 0$ ')
-                # plt.text(-0.7,0,f' Beta = {b:.2f} \n Lambda = {l:.2f} \n Alpha = {a:.2f} \n d = {d:.2f}')
-                # plt.savefig(os.path.join('curves',f'{img}-{b:.2f}-{l:.2f}.png'))
+                plt.text(-0.7,0,f' Beta = {b:.2f} \n Lambda = {l:.2f} \n Alpha = {a:.2f} \n d = {d:.2f} \n Gamma = {g:.2f}')
+                plt.savefig(os.path.join('curves',f'{img}-{b:.2f}-{l:.2f}.png'))
                 # plt.xlim(0.99,1.01)
                 # plt.ylim(-0.01,0.01)
                 # plt.text(1.005,0.005,f' Beta = {b} \n Lambda = {l} \n Alpha = {a} \n d = {d}')
                 # plt.savefig(os.path.join('curves',f'{img}-{b}-{l}-zoomed.png'))
 
-print(count)
-plt.xlabel('$\\beta$')
-plt.xlim(0,1)
-plt.ylim(0,1)
-plt.ylabel('$\lambda$')
-plt.title('$\\rho$ can go out of unit circle close to $\\theta = 0$')
-plt.show()
+# print(count)
+# plt.xlabel('$\\beta$')
+# plt.xlim(0,1)
+# plt.ylim(0,1)
+# plt.ylabel('$\lambda$')
+# plt.title('$\\rho$ can go out of unit circle close to $\\theta = 0$')
+# plt.show()
 
 
 # plt.figure()
