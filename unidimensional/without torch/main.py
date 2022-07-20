@@ -5,12 +5,12 @@ import matplotlib as mpl
 
 mpl.style.use('seaborn')
 #params
-b = 0.0
-l = 0.00001
-a = 0.01
+b = 0.5
+l = 0.2
+a = 0.9
 d = 1
 
-timesteps = 5000
+timesteps = 500
 J = 500
 
 #init

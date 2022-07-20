@@ -8,14 +8,14 @@ def main():
 
     g = []
     b = []
-    alphaR = [0.01]#0.01,0.05,0.1,0.5,1,10,  100]
-    numberEpochs = 15
+    alphaR = [100]
+    numberEpochs = 10
 
     gammaR = list(np.linspace(0,1,10))
     betaR = list(np.linspace(0,1,10))
 
 
-    trained_params_couples = [(0.1,0.8), (0.1,0.5), (0.1,0.1),(0.33,0.33),(0.2,0.5),(0.5,0.2),(0.5,0.1),(0.8,0.1)]
+    trained_params_couples = [(0.33,0.33)]#[(0.1,0.8), (0.1,0.5), (0.1,0.1),(0.33,0.33),(0.2,0.5),(0.5,0.2),(0.5,0.1),(0.8,0.1)]
 
     for gammaFw, betaFB in trained_params_couples:
 

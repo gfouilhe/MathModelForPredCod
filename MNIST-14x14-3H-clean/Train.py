@@ -10,10 +10,10 @@ def main():
     #-----------PARAMETERS--------------------
     iterationNumber = 1
     numberEpochs = 10
-    timeSteps = 30
+    timeSteps = 20
     #
-    gamma_beta_couples = [(0.7,0.1)]#[(0.1,0.8), (0.1,0.5), (0.1,0.1),(0.33,0.33),(0.2,0.5),(0.5,0.2),(0.5,0.1),(0.8,0.1)]#(0.7,0.1),(0.85,0.05),(0.95,0.01)] #[(gamma,beta) for gamma in gammaR for beta in betaR if beta+gamma <= 1]
-    alpha_range = [0.01] #,0.05,0.1,0.5]
+    gamma_beta_couples = [(0.33,0.33)]#[(0.1,0.8), (0.1,0.5), (0.1,0.1),(0.33,0.33),(0.2,0.5),(0.5,0.2),(0.5,0.1),(0.8,0.1)]#(0.7,0.1),(0.85,0.05),(0.95,0.01)] #[(gamma,beta) for gamma in gammaR for beta in betaR if beta+gamma <= 1]
+    alpha_range = [100]
     mode = 'FFRec' #Default (All) : train everything supervised; (Rec) means unsupervised learning for reconstruction
 
     transpose = False
@@ -21,7 +21,7 @@ def main():
     checkpoint = 0 #replace by list of "lalala.pth"
     activation_function = torch.tanh # or lambda x: x or F.relu
 
-    mu = 0 #parameters to balance supervised/unsupervised learning
+    mu = 1/4 #parameters to balance supervised/unsupervised learning
 
     print(f'Started train with mode {mode} with {iterationNumber} iterations, each of {numberEpochs} epochs and {timeSteps} time iterations.')
     
